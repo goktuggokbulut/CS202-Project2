@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox prefWidth="320.0" spacing="10.0" style="-fx-background-color: white; -fx-border-color: #d0d7de; -fx-border-radius: 8; -fx-background-radius: 8;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RestaurantCardController">
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+
+    <HBox alignment="TOP_LEFT" spacing="10.0">
+        <VBox HBox.hgrow="ALWAYS" spacing="2.0">
+            <Label fx:id="nameLabel" text="Restaurant Name" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+            <Label fx:id="cuisineLabel" text="Cuisine Type" style="-fx-text-fill: #57606a;" />
+        </VBox>
+        <Label fx:id="newBadge" text="New" visible="false" style="-fx-background-color: #dafbe1; -fx-text-fill: #1a7f37; -fx-font-weight: bold; -fx-padding: 2 8; -fx-background-radius: 12; -fx-font-size: 11px;" />
+    </HBox>
+
+    <Region prefHeight="40" /> <!-- Placeholder for an image or logo -->
+
+    <Separator />
+
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Label fx:id="ratingLabel" text="★ 0.0" style="-fx-font-weight: bold; -fx-text-fill: #9a6700;" />
+        <Label fx:id="ratingCountLabel" text="(0 ratings)" style="-fx-font-size: 12px; -fx-text-fill: #57606a;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="View Menu" onAction="#handleViewMenu" styleClass="btn-sm, btn-primary" />
+    </HBox>
+</VBox>

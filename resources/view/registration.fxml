@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RegistrationController">
+    <VBox spacing="20.0" alignment="TOP_CENTER">
+        <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+        </padding>
+
+        <Label text="Create New Account" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+        <Label text="Join the Foodly community today." style="-fx-text-fill: #57606a;" />
+
+        <VBox spacing="15.0" maxWidth="500.0" style="-fx-background-color: white; -fx-border-color: #d0d7de; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 25;">
+            
+            <Label text="Account Type" style="-fx-font-weight: bold;" />
+            <HBox spacing="20.0">
+                <RadioButton fx:id="customerRadio" text="Customer" selected="true">
+                    <toggleGroup><ToggleGroup fx:id="roleGroup"/></toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="managerRadio" text="Restaurant Manager" toggleGroup="$roleGroup" />
+            </HBox>
+
+            <Separator />
+
+            <GridPane hgap="15" vgap="15">
+                <columnConstraints>
+                    <ColumnConstraints prefWidth="150" />
+                    <ColumnConstraints hgrow="ALWAYS" />
+                </columnConstraints>
+
+                <Label text="Username" GridPane.rowIndex="0" />
+                <TextField fx:id="usernameField" promptText="Enter username" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label text="Email" GridPane.rowIndex="1" />
+                <TextField fx:id="emailField" promptText="email@example.com" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Password" GridPane.rowIndex="2" />
+                <PasswordField fx:id="passwordField" promptText="Minimum 6 characters" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Default City" GridPane.rowIndex="3" />
+                <TextField fx:id="cityField" promptText="e.g. Istanbul" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            </GridPane>
+
+            <Separator />
+
+            <!-- Multi-valued section: Phone -->
+            <VBox spacing="10">
+                <Label text="Phone Numbers" style="-fx-font-weight: bold;" />
+                <HBox spacing="10">
+                    <TextField fx:id="phoneField" promptText="e.g. +90 5xx..." HBox.hgrow="ALWAYS" />
+                    <Button text="Add" onAction="#addPhone" styleClass="btn-sm" />
+                </HBox>
+                <ListView fx:id="phoneListView" prefHeight="80" />
+            </VBox>
+
+            <!-- Multi-valued section: Address -->
+            <VBox spacing="10">
+                <Label text="Addresses" style="-fx-font-weight: bold;" />
+                <HBox spacing="10">
+                    <TextField fx:id="addressField" promptText="Street, Building, Flat..." HBox.hgrow="ALWAYS" />
+                    <Button text="Add" onAction="#addAddress" styleClass="btn-sm" />
+                </HBox>
+                <ListView fx:id="addressListView" prefHeight="80" />
+            </VBox>
+
+            <Button text="Register Account" onAction="#handleRegister" maxWidth="Infinity" styleClass="btn-primary, btn-lg" />
+            <Button text="Back to Login" onAction="#handleBack" maxWidth="Infinity" styleClass="flat" />
+            
+            <Label fx:id="messageLabel" wrapText="true" alignment="CENTER" maxWidth="Infinity" />
+        </VBox>
+    </VBox>
+</ScrollPane>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainDashboardController">
+    
+    <!-- Sidebar -->
+    <left>
+        <VBox prefWidth="250.0" spacing="10.0" style="-fx-background-color: #f6f8fa; -fx-border-color: #d0d7de; -fx-border-width: 0 1 0 0;">
+            <padding>
+                <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
+            </padding>
+            
+            <Label text="FOODLY  " style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0969da;">
+                <VBox.margin>
+                    <Insets bottom="20.0" />
+                </VBox.margin>
+            </Label>
+
+            <!-- Navigation Links (Dynamic based on role) -->
+            <VBox fx:id="navLinks" spacing="5.0" VBox.vgrow="ALWAYS">
+                <!-- Buttons will be injected here via controller -->
+            </VBox>
+
+            <Separator />
+            
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Circle radius="15.0" fill="#afb8c1" />
+                <VBox>
+                    <Label fx:id="usernameLabel" text="Username" style="-fx-font-weight: bold;" />
+                    <Label fx:id="roleLabel" text="Role" style="-fx-font-size: 11px; -fx-text-fill: #57606a;" />
+                </VBox>
+            </HBox>
+            
+            <Button text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="danger" />
+        </VBox>
+    </left>
+
+    <!-- Main Content Area -->
+    <center>
+        <StackPane fx:id="contentArea">
+            <padding>
+                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+            </padding>
+            <!-- Content will be swapped here -->
+            <VBox alignment="CENTER" spacing="10.0">
+                <Label text="Welcome to Foodly!  " style="-fx-font-size: 32px; -fx-font-weight: bold;" />
+                <Label text="Select an option from the sidebar to get started." style="-fx-text-fill: #57606a;" />
+            </VBox>
+        </StackPane>
+    </center>
+
+</BorderPane>

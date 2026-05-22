@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RestaurantSearchController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15.0">
+        <VBox spacing="5.0">
+            <Label text="Search Restaurants" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+            <Label fx:id="cityLabel" text="Showing restaurants in your city" style="-fx-text-fill: #57606a;" />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: white; -fx-border-color: #d0d7de; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 5 10;">
+            <TextField fx:id="searchField" promptText="Search by keyword..." prefWidth="300" style="-fx-background-color: transparent; -fx-border-width: 0;" />
+            <Button text="🔍" onAction="#handleSearch" styleClass="flat" />
+        </HBox>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+        <FlowPane fx:id="resultsPane" hgap="20" vgap="20">
+            <!-- Cards will be injected here -->
+        </FlowPane>
+    </ScrollPane>
+</VBox>
