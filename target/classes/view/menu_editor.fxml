@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="15.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.MenuEditorController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <!-- Header + restaurant selector -->
+    <HBox alignment="CENTER_LEFT" spacing="15.0">
+        <Label text="Manage Menu" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Label text="Restaurant:" style="-fx-text-fill: #57606a;" />
+        <ComboBox fx:id="restaurantSelector" prefWidth="240" promptText="Select restaurant" />
+    </HBox>
+
+    <Separator />
+
+    <!-- Tab pane -->
+    <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+
+        <!-- ═══ Tab 1: Menu Items ══════════════════════════════════════ -->
+        <Tab text="Menu Items">
+            <VBox spacing="10.0">
+                <padding><Insets top="10" /></padding>
+
+                <HBox spacing="10.0">
+                    <Button text="+ Add Item"    onAction="#handleAddItem"    styleClass="btn-primary" />
+                    <Button text="✎ Edit Item"   onAction="#handleEditItem"   styleClass="flat" />
+                    <Button text="✕ Delete Item" onAction="#handleDeleteItem" styleClass="danger" />
+                </HBox>
+
+                <TableView fx:id="itemTable" VBox.vgrow="ALWAYS" prefHeight="400">
+                    <columns>
+                        <TableColumn fx:id="itemCategoryCol" text="Category"    prefWidth="130" />
+                        <TableColumn fx:id="itemNameCol"     text="Name"        prefWidth="160" />
+                        <TableColumn fx:id="itemDescCol"     text="Description" prefWidth="260" />
+                        <TableColumn fx:id="itemPriceCol"    text="Price (₺)"   prefWidth="90" />
+                    </columns>
+                    <placeholder><Label text="No menu items yet." /></placeholder>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- ═══ Tab 2: Categories ══════════════════════════════════════ -->
+        <Tab text="Categories">
+            <VBox spacing="10.0">
+                <padding><Insets top="10" /></padding>
+
+                <HBox spacing="10.0">
+                    <Button text="+ Add Category"    onAction="#handleAddCategory"    styleClass="btn-primary" />
+                    <Button text="✕ Delete Category" onAction="#handleDeleteCategory" styleClass="danger" />
+                </HBox>
+
+                <TableView fx:id="categoryTable" VBox.vgrow="ALWAYS" prefHeight="350">
+                    <columns>
+                        <TableColumn fx:id="catNameCol" text="Category Name" prefWidth="300" />
+                    </columns>
+                    <placeholder><Label text="No categories yet." /></placeholder>
+                </TableView>
+
+                <Label text="Note: a category cannot be deleted while it has menu items assigned to it."
+                       style="-fx-text-fill: #57606a; -fx-font-size: 11px;" />
+            </VBox>
+        </Tab>
+
+        <!-- ═══ Tab 3: Coupons ════════════════════════════════════════ -->
+        <Tab text="Coupons">
+            <VBox spacing="10.0">
+                <padding><Insets top="10" /></padding>
+
+                <HBox spacing="10.0">
+                    <Button text="+ Create Coupon"   onAction="#handleAddCoupon"        styleClass="btn-primary" />
+                    <Button text="⊘ Deactivate"      onAction="#handleDeactivateCoupon" styleClass="flat" />
+                </HBox>
+
+                <TableView fx:id="couponTable" VBox.vgrow="ALWAYS" prefHeight="350">
+                    <columns>
+                        <TableColumn fx:id="couponCodeCol"   text="Code"       prefWidth="130" />
+                        <TableColumn fx:id="couponTypeCol"   text="Type"       prefWidth="100" />
+                        <TableColumn fx:id="couponValueCol"  text="Value"      prefWidth="80" />
+                        <TableColumn fx:id="couponFromCol"   text="Valid From"  prefWidth="110" />
+                        <TableColumn fx:id="couponUntilCol"  text="Valid Until" prefWidth="110" />
+                        <TableColumn fx:id="couponActiveCol" text="Active"     prefWidth="70" />
+                    </columns>
+                    <placeholder><Label text="No coupons yet." /></placeholder>
+                </TableView>
+            </VBox>
+        </Tab>
+
+    </TabPane>
+</VBox>

@@ -14,7 +14,8 @@
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <Label text="Monthly Performance" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
             <Region HBox.hgrow="ALWAYS" />
-            <Label fx:id="periodLabel" text="Last 30 Days" style="-fx-text-fill: #57606a;" />
+            <ComboBox fx:id="restaurantSelector" prefWidth="220" promptText="Select restaurant" />
+            <Label text="Last 30 Days" style="-fx-text-fill: #57606a;" />
         </HBox>
 
         <!-- Key Metrics Cards -->
@@ -59,9 +60,10 @@
                     <Label fx:id="topCustomerLabel" text="N/A" style="-fx-font-weight: bold;" />
                 </VBox>
                 
-                <VBox spacing="2">
+                <VBox spacing="4">
                     <Label text="Highest Value Order" style="-fx-font-size: 12px; -fx-text-fill: #57606a;" />
                     <Label fx:id="highestOrderLabel" text="N/A" style="-fx-font-weight: bold;" />
+                    <VBox fx:id="topOrderItemsBox" spacing="2" />
                 </VBox>
 
                 <VBox spacing="2">

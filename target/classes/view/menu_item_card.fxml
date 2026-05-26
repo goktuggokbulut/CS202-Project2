@@ -2,19 +2,30 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 
 <VBox prefWidth="280.0" spacing="8.0" style="-fx-background-color: white; -fx-border-color: #d0d7de; -fx-border-radius: 8; -fx-background-radius: 8;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuItemCardController">
-    <padding>
-        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
-    </padding>
 
-    <Label fx:id="nameLabel" text="Item Name" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-    <Label fx:id="descriptionLabel" text="Short description of the food item." wrapText="true" style="-fx-text-fill: #57606a; -fx-font-size: 12px;" prefHeight="40" alignment="TOP_LEFT" />
-    
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label fx:id="priceLabel" text="$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
-        <Region HBox.hgrow="ALWAYS" />
-        <Button text="Add" onAction="#handleAddToCart" styleClass="btn-sm, btn-success" />
-    </HBox>
+    <!-- Image area -->
+    <StackPane prefHeight="150" prefWidth="280"
+               style="-fx-background-color: #f6f8fa; -fx-border-radius: 8 8 0 0; -fx-background-radius: 8 8 0 0;">
+        <ImageView fx:id="itemImage" fitHeight="150" fitWidth="280" preserveRatio="false" />
+        <Label fx:id="imagePlaceholder" text="No Image"
+               style="-fx-text-fill: #8c959f; -fx-font-size: 12px;" visible="false" />
+    </StackPane>
+
+    <VBox spacing="8.0">
+        <padding>
+            <Insets bottom="12.0" left="12.0" right="12.0" top="8.0" />
+        </padding>
+        <Label fx:id="nameLabel" text="Item Name" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <Label fx:id="descriptionLabel" text="Short description of the food item." wrapText="true"
+               style="-fx-text-fill: #57606a; -fx-font-size: 12px;" prefHeight="40" alignment="TOP_LEFT" />
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label fx:id="priceLabel" text="$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Add" onAction="#handleAddToCart" styleClass="btn-sm, btn-success" />
+        </HBox>
+    </VBox>
 </VBox>

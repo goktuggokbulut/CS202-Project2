@@ -14,7 +14,7 @@
                 <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
             </padding>
             
-            <Label text="FOODLY  " style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0969da;">
+            <Label text="FOODLY" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0969da;">
                 <VBox.margin>
                     <Insets bottom="20.0" />
                 </VBox.margin>
@@ -47,7 +47,7 @@
             </padding>
             <!-- Content will be swapped here -->
             <VBox alignment="CENTER" spacing="10.0">
-                <Label text="Welcome to Foodly!  " style="-fx-font-size: 32px; -fx-font-weight: bold;" />
+                <Label text="Welcome to Foodly!" style="-fx-font-size: 32px; -fx-font-weight: bold;" />
                 <Label text="Select an option from the sidebar to get started." style="-fx-text-fill: #57606a;" />
             </VBox>
         </StackPane>
