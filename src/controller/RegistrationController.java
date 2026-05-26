@@ -5,9 +5,14 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import service.UserService;
 import utils.SceneManager;
 
+@Component
+@Scope("prototype")
 public class RegistrationController {
 
     @FXML private RadioButton customerRadio;
@@ -23,7 +28,8 @@ public class RegistrationController {
 
     private final ObservableList<String> phones = FXCollections.observableArrayList();
     private final ObservableList<String> addresses = FXCollections.observableArrayList();
-    private final UserService userService = new UserService();
+
+    @Autowired private UserService userService;
 
     @FXML
     public void initialize() {
@@ -62,7 +68,6 @@ public class RegistrationController {
         if (userService.register(user, type, addresses, phones)) {
             messageLabel.setText("Account created successfully!");
             messageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
-            // Optionally redirect after delay
         } else {
             messageLabel.setText("Registration failed. Check if username exists.");
             messageLabel.setTextFill(javafx.scene.paint.Color.RED);

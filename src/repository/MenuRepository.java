@@ -2,6 +2,7 @@ package repository;
 
 import model.MenuCategory;
 import model.MenuItem;
+import org.springframework.stereotype.Repository;
 import utils.DatabaseConnectionManager;
 
 import java.sql.*;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.math.BigDecimal;
 
+@Repository
 public class MenuRepository {
 
     /**

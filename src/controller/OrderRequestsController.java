@@ -12,6 +12,9 @@ import javafx.scene.layout.VBox;
 import model.Order;
 import model.OrderItem;
 import model.Restaurant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.OrderRepository;
 import repository.RestaurantRepository;
 import utils.Session;
@@ -21,14 +24,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
+@Component
+@Scope("prototype")
 public class OrderRequestsController {
 
     @FXML private ComboBox<Restaurant> restaurantSelector;
     @FXML private VBox ordersContainer;
     @FXML private Label emptyLabel;
 
-    private final OrderRepository orderRepository = new OrderRepository();
-    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
+    @Autowired private OrderRepository orderRepository;
+    @Autowired private RestaurantRepository restaurantRepository;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm, MMM dd");
 

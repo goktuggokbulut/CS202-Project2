@@ -5,11 +5,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import model.Restaurant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.RestaurantRepository;
 import utils.Session;
 
 import java.util.List;
 
+@Component
+@Scope("prototype")
 public class ManagerOverviewController {
 
     @FXML private ComboBox<Restaurant> restaurantSelector;
@@ -20,7 +25,7 @@ public class ManagerOverviewController {
     @FXML private Label ratingLabel;
     @FXML private Label ratingCountLabel;
 
-    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
+    @Autowired private RestaurantRepository restaurantRepository;
 
     @FXML
     public void initialize() {

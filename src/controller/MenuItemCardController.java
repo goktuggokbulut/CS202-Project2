@@ -5,12 +5,16 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import model.MenuItem;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import utils.Session;
 
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+@Component
+@Scope("prototype")
 public class MenuItemCardController {
 
     @FXML private ImageView itemImage;
@@ -38,15 +42,13 @@ public class MenuItemCardController {
             return;
         }
         try {
-            // First try as a classpath resource (e.g. "img/hummus.jpg")
             URL resource = getClass().getResource("/" + imageUrl);
             String urlStr = resource != null ? resource.toExternalForm() : imageUrl;
 
-            Image img = new Image(urlStr, 280, 150, false, true, true);  // background load
+            Image img = new Image(urlStr, 280, 150, false, true, true);
             img.errorProperty().addListener((obs, wasError, isError) -> {
                 if (isError) showPlaceholder();
             });
-            // If already loaded synchronously and errored
             if (img.isError()) {
                 showPlaceholder();
             } else {

@@ -1,14 +1,19 @@
 package controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.User;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import utils.SceneManager;
 import utils.Session;
 
+@Component
+@Scope("prototype")
 public class MainDashboardController {
 
     @FXML private VBox navLinks;
@@ -39,7 +44,7 @@ public class MainDashboardController {
 
     private void setupSidebar(String role) {
         navLinks.getChildren().clear();
-        
+
         if ("Customer".equalsIgnoreCase(role)) {
             addButton("Browse Restaurants", "restaurant_search");
             addButton("My Orders", "orders");
@@ -56,7 +61,7 @@ public class MainDashboardController {
     private void addButton(String text, String viewId) {
         Button btn = new Button(text);
         btn.setMaxWidth(Double.MAX_VALUE);
-        btn.getStyleClass().add("flat"); // AtlantaFX flat style
+        btn.getStyleClass().add("flat");
         btn.setOnAction(e -> loadView(viewId));
         navLinks.getChildren().add(btn);
     }
@@ -69,7 +74,11 @@ public class MainDashboardController {
                 System.err.println("CRITICAL: Cannot find resource at " + fxmlPath);
                 throw new java.io.IOException("Resource not found");
             }
-            javafx.scene.Parent view = javafx.fxml.FXMLLoader.load(resource);
+            FXMLLoader loader = new FXMLLoader(resource);
+            if (SceneManager.getSpringContext() != null) {
+                loader.setControllerFactory(SceneManager.getSpringContext()::getBean);
+            }
+            javafx.scene.Parent view = loader.load();
             contentArea.getChildren().setAll(view);
         } catch (Exception e) {
             Throwable cause = e;

@@ -8,7 +8,11 @@ import javafx.scene.layout.*;
 import model.Order;
 import model.OrderStatusHistory;
 import model.Rating;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.OrderRepository;
+import repository.RatingRepository;
 import service.RatingService;
 import utils.Session;
 
@@ -18,14 +22,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+@Component
+@Scope("prototype")
 public class OrdersController {
 
     @FXML private VBox ordersContainer;
     @FXML private Label emptyLabel;
 
-    private final OrderRepository orderRepository = new OrderRepository();
-    private final RatingService ratingService = new RatingService();
-    private final repository.RatingRepository ratingRepository = new repository.RatingRepository();
+    @Autowired private OrderRepository orderRepository;
+    @Autowired private RatingService ratingService;
+    @Autowired private RatingRepository ratingRepository;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm, MMM dd");
 
@@ -57,7 +63,7 @@ public class OrdersController {
 
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
-        
+
         VBox titleInfo = new VBox(2);
         Label restLabel = new Label(order.getRestaurantName());
         restLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
@@ -76,7 +82,7 @@ public class OrdersController {
             statusStyle += "-fx-background-color: #fff8c5; -fx-text-fill: #9a6700;";
         }
         statusLabel.setStyle(statusStyle);
-        
+
         header.getChildren().addAll(titleInfo, spacer, statusLabel);
 
         HBox footer = new HBox(15);
@@ -111,7 +117,7 @@ public class OrdersController {
         for (OrderStatusHistory h : history) {
             sb.append(String.format("[%s] %s\n", h.getTimeStamp().format(timeFormatter), h.getStatus()));
         }
-        
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Status History");
         alert.setHeaderText("Order #" + orderId);
@@ -120,7 +126,6 @@ public class OrdersController {
     }
 
     private void showRatingDialog(Order order) {
-        // Simple custom dialog for rating
         Dialog<Rating> dialog = new Dialog<>();
         dialog.setTitle("Rate your experience");
         dialog.setHeaderText("Rating for " + order.getRestaurantName());
@@ -130,7 +135,7 @@ public class OrdersController {
 
         VBox content = new VBox(10);
         content.setPadding(new Insets(20));
-        
+
         Label scoreLabel = new Label("Score (1-5):");
         Slider scoreSlider = new Slider(1, 5, 5);
         scoreSlider.setShowTickLabels(true);
@@ -164,7 +169,7 @@ public class OrdersController {
             if (ratingService.submitRating(rating)) {
                 Alert success = new Alert(Alert.AlertType.INFORMATION, "Thank you for your feedback!");
                 success.showAndWait();
-                loadOrders();   // hide the Rate button immediately
+                loadOrders();
             } else {
                 Alert error = new Alert(Alert.AlertType.ERROR, "Could not submit rating. Ensure it's within 24 hours of order acceptance.");
                 error.show();

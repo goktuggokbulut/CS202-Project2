@@ -9,23 +9,27 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import model.MenuItem;
 import model.OrderItem;
 import model.Restaurant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.MenuRepository;
+import utils.SceneManager;
 import utils.Session;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
+@Scope("prototype")
 public class MenuViewController {
 
     @FXML private Label restaurantNameLabel;
@@ -34,7 +38,7 @@ public class MenuViewController {
     @FXML private VBox cartItemsBox;
     @FXML private Label totalLabel;
 
-    private final MenuRepository menuRepository = new MenuRepository();
+    @Autowired private MenuRepository menuRepository;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
 
     @FXML
@@ -52,7 +56,6 @@ public class MenuViewController {
         menuContainer.getChildren().clear();
         List<MenuItem> items = menuRepository.getMenuByRestaurant(restaurantId);
 
-        // Group by category — guard against null categoryName
         Map<String, List<MenuItem>> grouped = items.stream()
                 .collect(Collectors.groupingBy(
                         i -> i.getCategoryName() != null ? i.getCategoryName() : "Other",
@@ -69,6 +72,9 @@ public class MenuViewController {
             for (MenuItem item : entry.getValue()) {
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/menu_item_card.fxml"));
+                    if (SceneManager.getSpringContext() != null) {
+                        loader.setControllerFactory(SceneManager.getSpringContext()::getBean);
+                    }
                     Parent card = loader.load();
                     MenuItemCardController ctrl = loader.getController();
                     ctrl.setItem(item, this::updateCartUI);

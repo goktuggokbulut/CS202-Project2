@@ -5,11 +5,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.UserRepository;
 import utils.Session;
 
 import java.util.List;
 
+@Component
+@Scope("prototype")
 public class ProfileController {
 
     @FXML private Label usernameLabel;
@@ -19,7 +24,7 @@ public class ProfileController {
     @FXML private ListView<String> addressListView;
     @FXML private ListView<String> phoneListView;
 
-    private final UserRepository userRepository = new UserRepository();
+    @Autowired private UserRepository userRepository;
 
     @FXML
     public void initialize() {
@@ -30,7 +35,6 @@ public class ProfileController {
             cityLabel.setText(user.getCity());
             typeLabel.setText(user.getUserType());
 
-            // Fetch multi-valued attributes
             List<String> addresses = userRepository.getAddresses(user.getUsername());
             addressListView.setItems(FXCollections.observableArrayList(addresses));
 

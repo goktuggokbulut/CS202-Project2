@@ -5,15 +5,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import service.UserService;
 
+@Component
+@Scope("prototype")
 public class LoginController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
 
-    private final UserService userService = new UserService();
+    @Autowired private UserService userService;
 
     @FXML
     private void handleLogin() {

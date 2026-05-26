@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import model.Restaurant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.RestaurantRepository;
 import utils.Session;
 
@@ -12,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
+@Scope("prototype")
 public class RestaurantSettingsController {
 
     @FXML private ComboBox<Restaurant> restaurantSelector;
@@ -23,12 +28,12 @@ public class RestaurantSettingsController {
     @FXML private TextField cuisineField;
     @FXML private TextField addressField;
     @FXML private TextField cityField;
-    @FXML private TextField keywordsField;   // comma-separated
+    @FXML private TextField keywordsField;
 
     @FXML private Button saveButton;
 
-    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
-    private Restaurant editingRestaurant = null;   // null → create mode
+    @Autowired private RestaurantRepository restaurantRepository;
+    private Restaurant editingRestaurant = null;
 
     @FXML
     public void initialize() {
@@ -36,10 +41,8 @@ public class RestaurantSettingsController {
         List<Restaurant> restaurants = restaurantRepository.getRestaurantsByManager(managerUsername);
 
         if (restaurants.isEmpty()) {
-            // Create mode
             enterCreateMode(managerUsername);
         } else {
-            // Edit mode — populate selector
             restaurantSelector.setItems(FXCollections.observableArrayList(restaurants));
             restaurantSelector.setVisible(true);
             restaurantSelector.setManaged(true);
@@ -50,14 +53,11 @@ public class RestaurantSettingsController {
         }
     }
 
-    // ── Mode helpers ─────────────────────────────────────────────────
-
     private void enterCreateMode(String managerUsername) {
         editingRestaurant = null;
         formTitleLabel.setText("Create Your Restaurant");
         saveButton.setText("Create Restaurant");
         clearForm();
-        // Pre-fill city from the manager's own profile
         cityField.setText(Session.getCurrentUser().getCity());
         statusLabel.setText("You don't have a restaurant yet. Fill in the details below to create one.");
         statusLabel.setStyle("-fx-text-fill: #9a6700;");
@@ -72,13 +72,10 @@ public class RestaurantSettingsController {
         cuisineField.setText(r.getCuisineType());
         addressField.setText(r.getAddress());
         cityField.setText(r.getCity());
-        // Load existing keywords from DB
         List<String> kws = restaurantRepository.getKeywords(r.getRestaurantId());
         keywordsField.setText(String.join(", ", kws));
         statusLabel.setVisible(false);
     }
-
-    // ── Save handler ─────────────────────────────────────────────────
 
     @FXML
     private void handleSave() {
@@ -97,7 +94,6 @@ public class RestaurantSettingsController {
         }
 
         if (editingRestaurant == null) {
-            // CREATE
             Restaurant r = new Restaurant();
             r.setName(name);
             r.setCuisineType(cuisine);
@@ -119,14 +115,12 @@ public class RestaurantSettingsController {
                 showStatus("Failed to create restaurant.", "-fx-text-fill: #cf222e;");
             }
         } else {
-            // UPDATE
             editingRestaurant.setName(name);
             editingRestaurant.setCuisineType(cuisine);
             editingRestaurant.setAddress(address);
             editingRestaurant.setCity(city);
             editingRestaurant.setKeywords(keywords);
             if (restaurantRepository.updateRestaurant(editingRestaurant)) {
-                // Refresh selector display
                 int idx = restaurantSelector.getSelectionModel().getSelectedIndex();
                 restaurantSelector.getItems().set(idx, editingRestaurant);
                 restaurantSelector.getSelectionModel().select(idx);
@@ -136,8 +130,6 @@ public class RestaurantSettingsController {
             }
         }
     }
-
-    // ── Helpers ───────────────────────────────────────────────────────
 
     private void clearForm() {
         nameField.clear();

@@ -1,22 +1,19 @@
 package service;
 
 import model.Rating;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import repository.RatingRepository;
 
-import java.time.LocalDateTime;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
+@Service
 public class RatingService {
 
-    private final RatingRepository ratingRepository;
+    @Autowired
+    private RatingRepository ratingRepository;
 
-    public RatingService() {
-        this.ratingRepository = new RatingRepository();
-    }
-
-    /**
-     * Enforces §5.8: Customers can rate a restaurant only within 24 hours of the order being accepted.
-     */
     public boolean submitRating(Rating rating) {
         LocalDateTime acceptanceTime = ratingRepository.getAcceptanceTime(rating.getOrderId());
         if (acceptanceTime == null) {

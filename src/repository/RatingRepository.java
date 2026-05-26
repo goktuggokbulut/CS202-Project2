@@ -1,11 +1,13 @@
 package repository;
 
 import model.Rating;
+import org.springframework.stereotype.Repository;
 import utils.DatabaseConnectionManager;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 
+@Repository
 public class RatingRepository {
 
     /**

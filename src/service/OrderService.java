@@ -1,44 +1,36 @@
 package service;
 
+import model.Coupon;
 import model.Order;
 import model.OrderItem;
-import model.Coupon;
-import repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import repository.CouponRepository;
+import repository.OrderRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Service
 public class OrderService {
 
-    private final OrderRepository orderRepository;
-    private final CouponRepository couponRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private CouponRepository couponRepository;
 
-    public OrderService() {
-        this.orderRepository = new OrderRepository();
-        this.couponRepository = new CouponRepository();
-    }
-
-    /**
-     * Places an order with coupon validation and total amount calculation.
-     */
     public boolean placeOrder(Order order, List<OrderItem> items) {
-        // 1. Single restaurant constraint is handled by DB trigger, 
-        // but we should ideally check it here too if we want a better error message.
-
-        // 2. Validate Coupon if present
         if (order.getCouponId() != null && order.getCouponId() > 0) {
             Coupon coupon = couponRepository.getValidCoupon(order.getCouponId(), order.getRestaurantId());
             if (coupon == null) {
                 System.err.println("Invalid or expired coupon.");
                 return false;
             }
-            // Calculate discount (simplified logic)
             BigDecimal subtotal = items.stream()
                 .map(i -> i.getUnitPrice().multiply(new BigDecimal(i.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-            
-            BigDecimal discount = BigDecimal.ZERO;
+
+            BigDecimal discount;
             if ("percentage".equalsIgnoreCase(coupon.getDiscountType())) {
                 discount = subtotal.multiply(coupon.getDiscountValue().divide(new BigDecimal(100)));
             } else {

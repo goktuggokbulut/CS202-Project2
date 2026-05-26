@@ -1,12 +1,14 @@
 package repository;
 
 import model.Restaurant;
+import org.springframework.stereotype.Repository;
 import utils.DatabaseConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class RestaurantRepository {
 
     /**

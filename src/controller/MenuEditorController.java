@@ -12,9 +12,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
@@ -24,20 +21,21 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import model.Coupon;
 import model.MenuCategory;
 import model.MenuItem;
 import model.Restaurant;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.CouponRepository;
 import repository.MenuRepository;
 import repository.RestaurantRepository;
 import utils.Session;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Files;
@@ -48,23 +46,21 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Component
+@Scope("prototype")
 public class MenuEditorController {
 
-    // ── Restaurant selector ──────────────────────────────────────────
     @FXML private ComboBox<Restaurant> restaurantSelector;
 
-    // ── Menu Items tab ───────────────────────────────────────────────
     @FXML private TableView<MenuItem>                        itemTable;
     @FXML private TableColumn<MenuItem, String>              itemCategoryCol;
     @FXML private TableColumn<MenuItem, String>              itemNameCol;
     @FXML private TableColumn<MenuItem, String>              itemDescCol;
     @FXML private TableColumn<MenuItem, BigDecimal>          itemPriceCol;
 
-    // ── Categories tab ───────────────────────────────────────────────
     @FXML private TableView<MenuCategory>                    categoryTable;
     @FXML private TableColumn<MenuCategory, String>          catNameCol;
 
-    // ── Coupons tab ──────────────────────────────────────────────────
     @FXML private TableView<Coupon>                          couponTable;
     @FXML private TableColumn<Coupon, String>                couponCodeCol;
     @FXML private TableColumn<Coupon, String>                couponTypeCol;
@@ -73,9 +69,9 @@ public class MenuEditorController {
     @FXML private TableColumn<Coupon, LocalDate>             couponUntilCol;
     @FXML private TableColumn<Coupon, Boolean>               couponActiveCol;
 
-    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
-    private final MenuRepository       menuRepository       = new MenuRepository();
-    private final CouponRepository     couponRepository     = new CouponRepository();
+    @Autowired private RestaurantRepository restaurantRepository;
+    @Autowired private MenuRepository       menuRepository;
+    @Autowired private CouponRepository     couponRepository;
 
     private final ObservableList<MenuItem>     items      = FXCollections.observableArrayList();
     private final ObservableList<MenuCategory> categories = FXCollections.observableArrayList();
@@ -83,7 +79,6 @@ public class MenuEditorController {
 
     @FXML
     public void initialize() {
-        // ── Table column bindings ───────────────────────────────────
         itemCategoryCol.setCellValueFactory(new PropertyValueFactory<>("categoryName"));
         itemNameCol    .setCellValueFactory(new PropertyValueFactory<>("name"));
         itemDescCol    .setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -101,7 +96,6 @@ public class MenuEditorController {
         couponActiveCol.setCellValueFactory(new PropertyValueFactory<>("active"));
         couponTable.setItems(coupons);
 
-        // ── Populate restaurant selector ───────────────────────────
         String managerUsername = Session.getCurrentUser().getUsername();
         List<Restaurant> restaurants = restaurantRepository.getRestaurantsByManager(managerUsername);
         restaurantSelector.setItems(FXCollections.observableArrayList(restaurants));
@@ -122,10 +116,6 @@ public class MenuEditorController {
     private Restaurant selectedRestaurant() {
         return restaurantSelector.getSelectionModel().getSelectedItem();
     }
-
-    // ══════════════════════════════════════════════════════════════════
-    //  MENU ITEMS
-    // ══════════════════════════════════════════════════════════════════
 
     @FXML
     private void handleAddItem() {
@@ -177,7 +167,6 @@ public class MenuEditorController {
         TextField descField  = new TextField(existing != null ? existing.getDescription() : "");
         TextField priceField = new TextField(existing != null ? existing.getPrice().toPlainString() : "");
 
-        // Image picker row
         final String[] selectedImagePath = { existing != null && existing.getImageUrl() != null ? existing.getImageUrl() : "" };
         boolean hasExistingImage = !selectedImagePath[0].isEmpty();
 
@@ -265,10 +254,6 @@ public class MenuEditorController {
         return dialog.showAndWait().filter(i -> i != null);
     }
 
-    // ══════════════════════════════════════════════════════════════════
-    //  CATEGORIES
-    // ══════════════════════════════════════════════════════════════════
-
     @FXML
     private void handleAddCategory() {
         Restaurant r = selectedRestaurant();
@@ -295,10 +280,6 @@ public class MenuEditorController {
             else showError("Could not delete. Ensure no menu items are in this category.");
         }
     }
-
-    // ══════════════════════════════════════════════════════════════════
-    //  COUPONS
-    // ══════════════════════════════════════════════════════════════════
 
     @FXML
     private void handleAddCoupon() {
@@ -363,19 +344,11 @@ public class MenuEditorController {
         return dialog.showAndWait().filter(c -> c != null);
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────
-
-    /**
-     * Copies the selected file into resources/img/items/ (and target/classes/img/items/)
-     * so it is available both at compile time and at runtime without a rebuild.
-     * Returns the classpath-relative path stored in the DB, e.g. "img/items/burger.jpg".
-     */
     private String copyImageToResources(File sourceFile) {
         try {
-            // Determine project root from classpath location of this class
             URL classLocation = getClass().getProtectionDomain().getCodeSource().getLocation();
-            Path targetClasses = Paths.get(classLocation.toURI()); // .../target/classes
-            Path projectRoot   = targetClasses.getParent().getParent(); // .../project
+            Path targetClasses = Paths.get(classLocation.toURI());
+            Path projectRoot   = targetClasses.getParent().getParent();
 
             Path runtimeDir  = targetClasses.resolve("img/items");
             Path resourceDir = projectRoot.resolve("resources/img/items");

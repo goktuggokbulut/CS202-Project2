@@ -8,6 +8,9 @@ import javafx.scene.layout.VBox;
 import model.OrderItem;
 import model.Restaurant;
 import model.RestaurantStatistics;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.OrderRepository;
 import repository.RestaurantRepository;
 import utils.Session;
@@ -18,6 +21,8 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
+@Component
+@Scope("prototype")
 public class StatisticsController {
 
     @FXML private ComboBox<Restaurant> restaurantSelector;
@@ -38,8 +43,8 @@ public class StatisticsController {
     @FXML private Label popularItemLabel;
     @FXML private Label topCategoryLabel;
 
-    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
-    private final OrderRepository      orderRepository      = new OrderRepository();
+    @Autowired private RestaurantRepository restaurantRepository;
+    @Autowired private OrderRepository      orderRepository;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
 
     @FXML
@@ -69,7 +74,7 @@ public class StatisticsController {
         restaurantRepository.fillAggregatedStats(restaurantId, stats);
         stats.setItemSales(restaurantRepository.getMonthlyItemSales(restaurantId));
 
-        BigDecimal revenue  = stats.getTotalRevenue()       != null ? stats.getTotalRevenue()       : BigDecimal.ZERO;
+        BigDecimal revenue  = stats.getTotalRevenue()        != null ? stats.getTotalRevenue()        : BigDecimal.ZERO;
         BigDecimal discount = stats.getTotalCouponDiscount() != null ? stats.getTotalCouponDiscount() : BigDecimal.ZERO;
 
         totalRevenueLabel.setText(currencyFormat.format(revenue));

@@ -5,9 +5,13 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import model.Restaurant;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 
+@Component
+@Scope("prototype")
 public class RestaurantCardController {
 
     @FXML private Label     nameLabel;
@@ -38,7 +42,6 @@ public class RestaurantCardController {
     }
 
     private void loadCoverImage() {
-        // Try restaurant-specific image first, then fall back to default
         String[] candidates = {
             "/img/restaurants/" + restaurant.getName().toLowerCase().replaceAll("\\s+", "_") + ".jpg",
             "/img/restaurant_default.jpg"
@@ -63,7 +66,7 @@ public class RestaurantCardController {
     @FXML
     private void handleViewMenu() {
         utils.Session.setSelectedRestaurant(restaurant);
-        utils.Session.clearCart(); // Start fresh for each restaurant
+        utils.Session.clearCart();
         controller.MainDashboardController.getInstance().loadViewByPath("menu_view");
     }
 }

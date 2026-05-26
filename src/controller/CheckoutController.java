@@ -6,6 +6,9 @@ import javafx.scene.control.*;
 import model.Coupon;
 import model.Order;
 import model.OrderItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import repository.CouponRepository;
 import service.OrderService;
 import utils.Session;
@@ -17,6 +20,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+@Component
+@Scope("prototype")
 public class CheckoutController {
 
     @FXML private ListView<String> summaryListView;
@@ -27,8 +32,8 @@ public class CheckoutController {
     @FXML private Label couponMessageLabel;
     @FXML private Label placeOrderMessageLabel;
 
-    private final OrderService orderService = new OrderService();
-    private final CouponRepository couponRepository = new CouponRepository();
+    @Autowired private OrderService orderService;
+    @Autowired private CouponRepository couponRepository;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
 
     private BigDecimal subtotal = BigDecimal.ZERO;

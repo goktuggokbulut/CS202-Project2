@@ -3,12 +3,14 @@ package repository;
 import model.Order;
 import model.OrderItem;
 import model.OrderStatusHistory;
+import org.springframework.stereotype.Repository;
 import utils.DatabaseConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class OrderRepository {
 
     /**
