@@ -30,7 +30,7 @@ public class OrderRepository {
                 // 1. Insert Order
                 stmtOrder.setString(1, order.getCustomerId());
                 stmtOrder.setInt(2, order.getRestaurantId());
-                if (order.getCouponId() > 0) stmtOrder.setInt(3, order.getCouponId());
+                if (order.getCouponId() != null && order.getCouponId() > 0) stmtOrder.setInt(3, order.getCouponId());
                 else stmtOrder.setNull(3, Types.INTEGER);
                 stmtOrder.setBigDecimal(4, order.getTotalAmount());
                 stmtOrder.setBigDecimal(5, order.getDiscountApplied());

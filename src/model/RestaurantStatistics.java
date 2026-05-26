@@ -22,6 +22,11 @@ public class RestaurantStatistics {
         public String itemName;
         public int unitsSold;
         public BigDecimal revenue;
+
+        public int      getItemId()   { return itemId; }
+        public String   getItemName() { return itemName; }
+        public int      getUnitsSold(){ return unitsSold; }
+        public BigDecimal getRevenue(){ return revenue; }
     }
 
     public static class TopCustomer {

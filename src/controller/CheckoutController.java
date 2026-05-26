@@ -89,21 +89,31 @@ public class CheckoutController {
 
     @FXML
     private void handlePlaceOrder() {
-        Order order = new Order();
-        order.setCustomerId(Session.getCurrentUser().getUsername());
-        order.setRestaurantId(Session.getSelectedRestaurant().getRestaurantId());
-        if (appliedCoupon != null) {
-            order.setCouponId(appliedCoupon.getCouponId());
-        }
+        try {
+            if (Session.getCart().isEmpty()) {
+                placeOrderMessageLabel.setText("Your cart is empty.");
+                placeOrderMessageLabel.setTextFill(javafx.scene.paint.Color.RED);
+                return;
+            }
+            Order order = new Order();
+            order.setCustomerId(Session.getCurrentUser().getUsername());
+            order.setRestaurantId(Session.getSelectedRestaurant().getRestaurantId());
+            if (appliedCoupon != null) {
+                order.setCouponId(appliedCoupon.getCouponId());
+            }
 
-        if (orderService.placeOrder(order, Session.getCart())) {
-            placeOrderMessageLabel.setText("Order placed successfully! Redirecting...");
-            placeOrderMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
-            Session.clearCart();
-            // Redirect to Orders after delay or immediately
-            MainDashboardController.getInstance().loadViewByPath("orders");
-        } else {
-            placeOrderMessageLabel.setText("Failed to place order. Please try again.");
+            if (orderService.placeOrder(order, Session.getCart())) {
+                placeOrderMessageLabel.setText("Order placed successfully! Redirecting...");
+                placeOrderMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
+                Session.clearCart();
+                MainDashboardController.getInstance().loadViewByPath("orders");
+            } else {
+                placeOrderMessageLabel.setText("Failed to place order. Check the console for details.");
+                placeOrderMessageLabel.setTextFill(javafx.scene.paint.Color.RED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            placeOrderMessageLabel.setText("Error: " + e.getMessage());
             placeOrderMessageLabel.setTextFill(javafx.scene.paint.Color.RED);
         }
     }

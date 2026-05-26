@@ -27,7 +27,7 @@ public class OrderService {
         // but we should ideally check it here too if we want a better error message.
 
         // 2. Validate Coupon if present
-        if (order.getCouponId() > 0) {
+        if (order.getCouponId() != null && order.getCouponId() > 0) {
             Coupon coupon = couponRepository.getValidCoupon(order.getCouponId(), order.getRestaurantId());
             if (coupon == null) {
                 System.err.println("Invalid or expired coupon.");
