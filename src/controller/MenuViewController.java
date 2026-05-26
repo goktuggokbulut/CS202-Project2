@@ -46,17 +46,20 @@ public class MenuViewController {
         menuContainer.getChildren().clear();
         List<MenuItem> items = menuRepository.getMenuByRestaurant(restaurantId);
 
-        // Group by category
+        // Group by category — guard against null categoryName
         Map<String, List<MenuItem>> grouped = items.stream()
-                .collect(Collectors.groupingBy(MenuItem::getCategoryName, LinkedHashMap::new, Collectors.toList()));
+                .collect(Collectors.groupingBy(
+                        i -> i.getCategoryName() != null ? i.getCategoryName() : "Other",
+                        LinkedHashMap::new,
+                        Collectors.toList()));
 
         for (Map.Entry<String, List<MenuItem>> entry : grouped.entrySet()) {
             VBox categoryBox = new VBox(10);
             Label catLabel = new Label(entry.getKey());
             catLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10 0 5 0;");
-            
+
             FlowPane itemPane = new FlowPane(15, 15);
-            
+
             for (MenuItem item : entry.getValue()) {
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/menu_item_card.fxml"));
@@ -64,11 +67,11 @@ public class MenuViewController {
                     MenuItemCardController ctrl = loader.getController();
                     ctrl.setItem(item, this::updateCartUI);
                     itemPane.getChildren().add(card);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            
+
             categoryBox.getChildren().addAll(catLabel, itemPane);
             menuContainer.getChildren().add(categoryBox);
         }

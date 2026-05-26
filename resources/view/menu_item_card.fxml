@@ -11,9 +11,7 @@
     <StackPane prefHeight="150" prefWidth="280"
                style="-fx-background-color: #f6f8fa; -fx-border-radius: 8 8 0 0; -fx-background-radius: 8 8 0 0;">
         <ImageView fx:id="itemImage" fitHeight="150" fitWidth="280" preserveRatio="false" />
-        <ImageView fx:id="imagePlaceholder" fitHeight="150" fitWidth="280" preserveRatio="false" visible="false">
-            <image><Image url="@/img/food_placeholder.jpg" /></image>
-        </ImageView>
+        <ImageView fx:id="imagePlaceholder" fitHeight="150" fitWidth="280" preserveRatio="false" visible="false" />
     </StackPane>
 
     <VBox spacing="8.0">
@@ -24,7 +22,7 @@
         <Label fx:id="descriptionLabel" text="Short description of the food item." wrapText="true"
                style="-fx-text-fill: #57606a; -fx-font-size: 12px;" prefHeight="40" alignment="TOP_LEFT" />
         <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label fx:id="priceLabel" text="$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
+            <Label fx:id="priceLabel" text="0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
             <Region HBox.hgrow="ALWAYS" />
             <Button text="Add" onAction="#handleAddToCart" styleClass="btn-sm, btn-success" />
         </HBox>

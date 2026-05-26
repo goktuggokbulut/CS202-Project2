@@ -29,13 +29,13 @@
                 </columnConstraints>
                 
                 <Label text="Subtotal:" GridPane.rowIndex="0" />
-                <Label fx:id="subtotalLabel" text="$0.00" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label fx:id="subtotalLabel" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                 
                 <Label text="Discount Applied:" GridPane.rowIndex="1" style="-fx-text-fill: #cf222e;" />
-                <Label fx:id="discountLabel" text="-$0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-text-fill: #cf222e;" />
+                <Label fx:id="discountLabel" text="-0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-text-fill: #cf222e;" />
                 
                 <Label text="Total Amount:" GridPane.rowIndex="2" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
-                <Label fx:id="totalLabel" text="$0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
+                <Label fx:id="totalLabel" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
             </GridPane>
         </VBox>
 

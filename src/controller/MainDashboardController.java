@@ -72,9 +72,11 @@ public class MainDashboardController {
             javafx.scene.Parent view = javafx.fxml.FXMLLoader.load(resource);
             contentArea.getChildren().setAll(view);
         } catch (Exception e) {
-            System.err.println("Failed to load view '" + viewId + "': " + e.getMessage());
+            Throwable cause = e;
+            while (cause.getCause() != null) cause = cause.getCause();
+            System.err.println("Failed to load view '" + viewId + "': " + cause);
             e.printStackTrace();
-            Label errorLabel = new Label("Error loading view: " + e.getMessage());
+            Label errorLabel = new Label("Root cause: " + cause.getClass().getSimpleName() + ": " + cause.getMessage());
             errorLabel.setWrapText(true);
             contentArea.getChildren().setAll(errorLabel);
         }

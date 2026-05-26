@@ -36,7 +36,7 @@
         <HBox alignment="CENTER_LEFT">
             <Label text="Total:" style="-fx-font-weight: bold;" />
             <Region HBox.hgrow="ALWAYS" />
-            <Label fx:id="totalLabel" text="$0.00" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
+            <Label fx:id="totalLabel" text="0.00" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
         </HBox>
 
         <Button text="Checkout" onAction="#handleCheckout" maxWidth="Infinity" styleClass="btn-primary, btn-lg" />

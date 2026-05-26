@@ -60,6 +60,10 @@ public class MenuItemCardController {
 
     private void showPlaceholder() {
         itemImage.setImage(null);
+        if (imagePlaceholder.getImage() == null) {
+            java.net.URL ph = getClass().getResource("/img/food_placeholder.jpg");
+            if (ph != null) imagePlaceholder.setImage(new Image(ph.toExternalForm(), 280, 150, false, true));
+        }
         imagePlaceholder.setVisible(true);
     }
 

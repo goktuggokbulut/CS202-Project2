@@ -69,18 +69,20 @@ public class StatisticsController {
         restaurantRepository.fillAggregatedStats(restaurantId, stats);
         stats.setItemSales(restaurantRepository.getMonthlyItemSales(restaurantId));
 
-        totalRevenueLabel.setText(currencyFormat.format(stats.getTotalRevenue()));
+        BigDecimal revenue  = stats.getTotalRevenue()       != null ? stats.getTotalRevenue()       : BigDecimal.ZERO;
+        BigDecimal discount = stats.getTotalCouponDiscount() != null ? stats.getTotalCouponDiscount() : BigDecimal.ZERO;
+
+        totalRevenueLabel.setText(currencyFormat.format(revenue));
         totalOrdersLabel.setText(String.valueOf(stats.getTotalOrders()));
 
         if (stats.getTotalOrders() > 0) {
-            BigDecimal avg = stats.getTotalRevenue()
-                    .divide(new BigDecimal(stats.getTotalOrders()), 2, RoundingMode.HALF_UP);
+            BigDecimal avg = revenue.divide(new BigDecimal(stats.getTotalOrders()), 2, RoundingMode.HALF_UP);
             avgOrderLabel.setText(currencyFormat.format(avg));
         } else {
             avgOrderLabel.setText(currencyFormat.format(BigDecimal.ZERO));
         }
 
-        totalDiscountLabel.setText("-" + currencyFormat.format(stats.getTotalCouponDiscount()));
+        totalDiscountLabel.setText("-" + currencyFormat.format(discount));
 
         itemSalesTable.setItems(FXCollections.observableArrayList(stats.getItemSales()));
 
