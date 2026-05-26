@@ -2,27 +2,66 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<HBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.LoginController"
+      prefWidth="960.0" prefHeight="640.0">
 
-    <Label text="Online Food Ordering System" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-    
-    <GridPane hgap="10" vgap="10" alignment="CENTER">
-        <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <TextField fx:id="usernameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-        
-        <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-    </GridPane>
+    <!-- Left: food background image -->
+    <StackPane prefWidth="480.0" prefHeight="640.0">
+        <ImageView fitWidth="480" fitHeight="640" preserveRatio="false">
+            <image><Image url="@/img/login_bg.jpg" /></image>
+        </ImageView>
+        <!-- Dark overlay -->
+        <Pane style="-fx-background-color: rgba(0,0,0,0.35);" prefWidth="480" prefHeight="640" />
+        <VBox alignment="BOTTOM_LEFT" spacing="8">
+            <padding><Insets bottom="40" left="40" right="40" top="40" /></padding>
+            <Label text="FOODLY" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;" />
+            <Label text="Order your favorite food, delivered fast." wrapText="true"
+                   style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.85); -fx-max-width: 380;" />
+        </VBox>
+    </StackPane>
 
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Login" onAction="#handleLogin" styleClass="btn, btn-primary"/>
-        <Button text="Register" onAction="#handleRegister" styleClass="btn, btn-secondary"/>
-    </HBox>
+    <!-- Right: login form -->
+    <VBox alignment="CENTER" spacing="0" HBox.hgrow="ALWAYS"
+          style="-fx-background-color: white;">
+        <padding><Insets left="60" right="60" /></padding>
 
-    <Label fx:id="messageLabel" textFill="RED"/>
-</VBox>
+        <!-- Logo + title -->
+        <VBox alignment="CENTER" spacing="12">
+            <VBox.margin><Insets bottom="36" /></VBox.margin>
+            <ImageView fitWidth="64" fitHeight="64" preserveRatio="true">
+                <image><Image url="@/img/logo.png" /></image>
+            </ImageView>
+            <Label text="Welcome back" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
+            <Label text="Sign in to your account" style="-fx-font-size: 13px; -fx-text-fill: #57606a;" />
+        </VBox>
+
+        <!-- Fields -->
+        <VBox spacing="14" maxWidth="320">
+            <VBox spacing="4">
+                <Label text="Username" style="-fx-font-size: 13px; -fx-font-weight: bold;" />
+                <TextField fx:id="usernameField" promptText="Enter username" prefWidth="320"
+                           style="-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #d0d7de; -fx-padding: 8 12;" />
+            </VBox>
+            <VBox spacing="4">
+                <Label text="Password" style="-fx-font-size: 13px; -fx-font-weight: bold;" />
+                <PasswordField fx:id="passwordField" promptText="Enter password" prefWidth="320"
+                               style="-fx-background-radius: 6; -fx-border-radius: 6; -fx-border-color: #d0d7de; -fx-padding: 8 12;" />
+            </VBox>
+            <Label fx:id="messageLabel" textFill="RED" wrapText="true" maxWidth="320" />
+        </VBox>
+
+        <!-- Buttons -->
+        <VBox spacing="10" maxWidth="320">
+            <VBox.margin><Insets top="24" /></VBox.margin>
+            <Button text="Sign In" onAction="#handleLogin" maxWidth="320" prefHeight="40"
+                    styleClass="btn-primary" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <Button text="Create an account" onAction="#handleRegister" maxWidth="320" prefHeight="36"
+                    styleClass="flat" style="-fx-font-size: 13px;" />
+        </VBox>
+    </VBox>
+
+</HBox>

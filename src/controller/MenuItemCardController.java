@@ -14,7 +14,7 @@ import java.util.Locale;
 public class MenuItemCardController {
 
     @FXML private ImageView itemImage;
-    @FXML private Label     imagePlaceholder;
+    @FXML private ImageView imagePlaceholder;
     @FXML private Label     nameLabel;
     @FXML private Label     descriptionLabel;
     @FXML private Label     priceLabel;

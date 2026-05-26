@@ -63,7 +63,6 @@ public class MainDashboardController {
 
     private void loadView(String viewId) {
         try {
-            // Use an absolute path from the classpath root
             String fxmlPath = "/view/" + viewId + ".fxml";
             java.net.URL resource = getClass().getResource(fxmlPath);
             if (resource == null) {
@@ -72,10 +71,11 @@ public class MainDashboardController {
             }
             javafx.scene.Parent view = javafx.fxml.FXMLLoader.load(resource);
             contentArea.getChildren().setAll(view);
-        } catch (java.io.IOException e) {
+        } catch (Exception e) {
+            System.err.println("Failed to load view '" + viewId + "': " + e.getMessage());
             e.printStackTrace();
-            // Fallback for missing views
-            Label errorLabel = new Label("View not found: " + viewId);
+            Label errorLabel = new Label("Error loading view: " + e.getMessage());
+            errorLabel.setWrapText(true);
             contentArea.getChildren().setAll(errorLabel);
         }
     }

@@ -11,8 +11,9 @@
     <StackPane prefHeight="150" prefWidth="280"
                style="-fx-background-color: #f6f8fa; -fx-border-radius: 8 8 0 0; -fx-background-radius: 8 8 0 0;">
         <ImageView fx:id="itemImage" fitHeight="150" fitWidth="280" preserveRatio="false" />
-        <Label fx:id="imagePlaceholder" text="No Image"
-               style="-fx-text-fill: #8c959f; -fx-font-size: 12px;" visible="false" />
+        <ImageView fx:id="imagePlaceholder" fitHeight="150" fitWidth="280" preserveRatio="false" visible="false">
+            <image><Image url="@/img/food_placeholder.jpg" /></image>
+        </ImageView>
     </StackPane>
 
     <VBox spacing="8.0">

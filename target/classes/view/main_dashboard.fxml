@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.shape.Circle?>
 
@@ -13,12 +14,14 @@
             <padding>
                 <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
             </padding>
-            
-            <Label text="FOODLY" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0969da;">
-                <VBox.margin>
-                    <Insets bottom="20.0" />
-                </VBox.margin>
-            </Label>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <VBox.margin><Insets bottom="20.0" /></VBox.margin>
+                <ImageView fitWidth="36" fitHeight="36" preserveRatio="true">
+                    <image><Image url="@/img/logo.png" /></image>
+                </ImageView>
+                <Label text="FOODLY" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0969da;" />
+            </HBox>
 
             <!-- Navigation Links (Dynamic based on role) -->
             <VBox fx:id="navLinks" spacing="5.0" VBox.vgrow="ALWAYS">
