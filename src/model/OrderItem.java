@@ -32,4 +32,13 @@ public class OrderItem {
     public void       setItemName(String v)      { this.itemName = v; }
     public String     getImageUrl()              { return imageUrl; }
     public void       setImageUrl(String v)      { this.imageUrl = v; }
+
+    /** Converts this cart entry back to a MenuItem so Session.addToCart() can increment it. */
+    public MenuItem toMenuItem() {
+        MenuItem m = new MenuItem();
+        m.setItemId(itemId);
+        m.setName(itemName);
+        m.setPrice(unitPrice);
+        return m;
+    }
 }

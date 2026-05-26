@@ -29,10 +29,12 @@
     <!-- Cart Sidebar -->
     <VBox prefWidth="300.0" spacing="15.0" style="-fx-background-color: white; -fx-border-color: #d0d7de; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15;">
         <Label text="Your Cart" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
-        <ListView fx:id="cartListView" VBox.vgrow="ALWAYS" />
-        
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-width: 0;">
+            <VBox fx:id="cartItemsBox" spacing="6" />
+        </ScrollPane>
+
         <Separator />
-        
+
         <HBox alignment="CENTER_LEFT">
             <Label text="Total:" style="-fx-font-weight: bold;" />
             <Region HBox.hgrow="ALWAYS" />

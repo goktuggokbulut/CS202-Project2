@@ -20,8 +20,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.CheckBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import model.Coupon;
 import model.MenuCategory;
 import model.MenuItem;
@@ -31,7 +36,14 @@ import repository.MenuRepository;
 import repository.RestaurantRepository;
 import utils.Session;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -164,7 +176,53 @@ public class MenuEditorController {
         TextField nameField  = new TextField(existing != null ? existing.getName() : "");
         TextField descField  = new TextField(existing != null ? existing.getDescription() : "");
         TextField priceField = new TextField(existing != null ? existing.getPrice().toPlainString() : "");
-        TextField imgField   = new TextField(existing != null ? existing.getImageUrl() : "");
+
+        // Image picker row
+        final String[] selectedImagePath = { existing != null && existing.getImageUrl() != null ? existing.getImageUrl() : "" };
+        boolean hasExistingImage = !selectedImagePath[0].isEmpty();
+
+        CheckBox imgCheckBox = new CheckBox("Custom image");
+        imgCheckBox.setSelected(hasExistingImage);
+
+        ImageView preview = new ImageView();
+        preview.setFitWidth(120); preview.setFitHeight(70); preview.setPreserveRatio(true);
+        loadPreview(preview, selectedImagePath[0]);
+
+        Label imgNameLabel = new Label(hasExistingImage ? Paths.get(selectedImagePath[0]).getFileName().toString() : "No image selected");
+        imgNameLabel.setStyle("-fx-text-fill: #57606a; -fx-font-size: 11px;");
+
+        Button browseBtn = new Button("Browse…");
+        browseBtn.setOnAction(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Select Item Image");
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif"));
+            File file = fc.showOpenDialog(dialog.getDialogPane().getScene().getWindow());
+            if (file != null) {
+                String storedPath = copyImageToResources(file);
+                if (storedPath != null) {
+                    selectedImagePath[0] = storedPath;
+                    imgNameLabel.setText(file.getName());
+                    loadPreview(preview, storedPath);
+                }
+            }
+        });
+
+        VBox imgPickerBox = new VBox(6, preview, imgNameLabel, browseBtn);
+        imgPickerBox.setVisible(hasExistingImage);
+        imgPickerBox.setManaged(hasExistingImage);
+
+        imgCheckBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            imgPickerBox.setVisible(isSelected);
+            imgPickerBox.setManaged(isSelected);
+            if (!isSelected) {
+                selectedImagePath[0] = "";
+                preview.setImage(null);
+                imgNameLabel.setText("No image selected");
+            }
+        });
+
+        VBox imgBox = new VBox(6, imgCheckBox, imgPickerBox);
+
         ComboBox<MenuCategory> catBox = new ComboBox<>(FXCollections.observableArrayList(cats));
         catBox.setConverter(new javafx.util.StringConverter<MenuCategory>() {
             public String toString(MenuCategory c)   { return c == null ? "" : c.getName(); }
@@ -180,7 +238,7 @@ public class MenuEditorController {
         grid.addRow(0, new Label("Name:"),        nameField);
         grid.addRow(1, new Label("Description:"), descField);
         grid.addRow(2, new Label("Price:"),        priceField);
-        grid.addRow(3, new Label("Image URL:"),    imgField);
+        grid.addRow(3, new Label("Image:"),        imgBox);
         grid.addRow(4, new Label("Category:"),     catBox);
         dialog.getDialogPane().setContent(grid);
 
@@ -191,7 +249,7 @@ public class MenuEditorController {
                 item.setName(nameField.getText().trim());
                 item.setDescription(descField.getText().trim());
                 item.setPrice(new BigDecimal(priceField.getText().trim()));
-                item.setImageUrl(imgField.getText().trim());
+                item.setImageUrl(selectedImagePath[0]);
                 MenuCategory cat = catBox.getSelectionModel().getSelectedItem();
                 if (cat != null) {
                     item.setCategoryId(cat.getCategoryId());
@@ -306,6 +364,46 @@ public class MenuEditorController {
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
+
+    /**
+     * Copies the selected file into resources/img/items/ (and target/classes/img/items/)
+     * so it is available both at compile time and at runtime without a rebuild.
+     * Returns the classpath-relative path stored in the DB, e.g. "img/items/burger.jpg".
+     */
+    private String copyImageToResources(File sourceFile) {
+        try {
+            // Determine project root from classpath location of this class
+            URL classLocation = getClass().getProtectionDomain().getCodeSource().getLocation();
+            Path targetClasses = Paths.get(classLocation.toURI()); // .../target/classes
+            Path projectRoot   = targetClasses.getParent().getParent(); // .../project
+
+            Path runtimeDir  = targetClasses.resolve("img/items");
+            Path resourceDir = projectRoot.resolve("resources/img/items");
+            Files.createDirectories(runtimeDir);
+            Files.createDirectories(resourceDir);
+
+            String filename = sourceFile.getName();
+            Files.copy(sourceFile.toPath(), runtimeDir .resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(sourceFile.toPath(), resourceDir.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+
+            return "img/items/" + filename;
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Could not copy image: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private void loadPreview(ImageView view, String path) {
+        if (path == null || path.isBlank()) { view.setImage(null); return; }
+        try {
+            URL resource = getClass().getResource("/" + path);
+            String url = resource != null ? resource.toExternalForm() : path;
+            view.setImage(new Image(url, 120, 70, true, true, true));
+        } catch (Exception e) {
+            view.setImage(null);
+        }
+    }
 
     private boolean confirmDelete(String message) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);

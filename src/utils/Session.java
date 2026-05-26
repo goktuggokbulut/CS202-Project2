@@ -47,6 +47,20 @@ public class Session {
         cart.add(newItem);
     }
 
+    public static void removeFromCart(int itemId) {
+        cart.removeIf(oi -> oi.getItemId() == itemId);
+    }
+
+    public static void decreaseFromCart(int itemId) {
+        for (model.OrderItem oi : cart) {
+            if (oi.getItemId() == itemId) {
+                if (oi.getQuantity() <= 1) cart.remove(oi);
+                else oi.setQuantity(oi.getQuantity() - 1);
+                return;
+            }
+        }
+    }
+
     public static void clearCart() {
         cart.clear();
     }

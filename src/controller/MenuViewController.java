@@ -1,12 +1,15 @@
 package controller;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import model.MenuItem;
 import model.OrderItem;
@@ -17,7 +20,10 @@ import utils.Session;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MenuViewController {
@@ -25,7 +31,7 @@ public class MenuViewController {
     @FXML private Label restaurantNameLabel;
     @FXML private Label cuisineLabel;
     @FXML private VBox menuContainer;
-    @FXML private ListView<String> cartListView;
+    @FXML private VBox cartItemsBox;
     @FXML private Label totalLabel;
 
     private final MenuRepository menuRepository = new MenuRepository();
@@ -78,17 +84,41 @@ public class MenuViewController {
     }
 
     private void updateCartUI() {
+        cartItemsBox.getChildren().clear();
         List<OrderItem> cart = Session.getCart();
-        List<String> displayList = cart.stream()
-                .map(oi -> String.format("%dx %s (%s)", oi.getQuantity(), oi.getItemName(), currencyFormat.format(oi.getUnitPrice())))
-                .collect(Collectors.toList());
-        
-        cartListView.setItems(FXCollections.observableArrayList(displayList));
+
+        for (OrderItem oi : cart) {
+            HBox row = new HBox(6);
+            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            row.setStyle("-fx-background-color: #f6f8fa; -fx-background-radius: 6; -fx-padding: 6 8;");
+
+            Label nameLabel = new Label(oi.getItemName());
+            nameLabel.setStyle("-fx-font-size: 12px;");
+            HBox.setHgrow(nameLabel, Priority.ALWAYS);
+            nameLabel.setMaxWidth(Double.MAX_VALUE);
+
+            Button minusBtn = new Button("−");
+            minusBtn.getStyleClass().addAll("btn-sm", "flat");
+            minusBtn.setOnAction(e -> { Session.decreaseFromCart(oi.getItemId()); updateCartUI(); });
+
+            Label qtyLabel = new Label(String.valueOf(oi.getQuantity()));
+            qtyLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 18; -fx-alignment: CENTER;");
+
+            Button plusBtn = new Button("+");
+            plusBtn.getStyleClass().addAll("btn-sm", "flat");
+            plusBtn.setOnAction(e -> { Session.addToCart(oi.toMenuItem()); updateCartUI(); });
+
+            Button removeBtn = new Button("×");
+            removeBtn.getStyleClass().addAll("btn-sm", "danger");
+            removeBtn.setOnAction(e -> { Session.removeFromCart(oi.getItemId()); updateCartUI(); });
+
+            row.getChildren().addAll(nameLabel, minusBtn, qtyLabel, plusBtn, removeBtn);
+            cartItemsBox.getChildren().add(row);
+        }
 
         BigDecimal total = cart.stream()
                 .map(oi -> oi.getUnitPrice().multiply(new BigDecimal(oi.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
         totalLabel.setText(currencyFormat.format(total));
     }
 
