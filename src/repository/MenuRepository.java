@@ -7,6 +7,7 @@ import utils.DatabaseConnectionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 public class MenuRepository {
 
@@ -67,5 +68,87 @@ public class MenuRepository {
             e.printStackTrace();
         }
         return categories;
+    }
+
+    // ----------------------------------------------------------------
+    // Write operations
+    // ----------------------------------------------------------------
+
+    public MenuCategory addCategory(MenuCategory category) {
+        String sql = "INSERT INTO Menu_Category (name, restaurant_id) VALUES (?, ?)";
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, category.getName());
+            stmt.setInt(2, category.getRestaurantId());
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) category.setCategoryId(rs.getInt(1));
+            }
+            return category;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean deleteCategory(int categoryId) {
+        String sql = "DELETE FROM Menu_Category WHERE category_id = ?";
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, categoryId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public MenuItem addMenuItem(MenuItem item) {
+        String sql = "INSERT INTO Menu_Item (name, description, price, image_url, category_id) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, item.getName());
+            stmt.setString(2, item.getDescription());
+            stmt.setBigDecimal(3, item.getPrice());
+            stmt.setString(4, item.getImageUrl());
+            stmt.setInt(5, item.getCategoryId());
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) item.setItemId(rs.getInt(1));
+            }
+            return item;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updateMenuItem(MenuItem item) {
+        String sql = "UPDATE Menu_Item SET name=?, description=?, price=?, image_url=?, category_id=? WHERE item_id=?";
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, item.getName());
+            stmt.setString(2, item.getDescription());
+            stmt.setBigDecimal(3, item.getPrice());
+            stmt.setString(4, item.getImageUrl());
+            stmt.setInt(5, item.getCategoryId());
+            stmt.setInt(6, item.getItemId());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteMenuItem(int itemId) {
+        String sql = "DELETE FROM Menu_Item WHERE item_id = ?";
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, itemId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

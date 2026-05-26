@@ -25,7 +25,8 @@ public class OrdersController {
 
     private final OrderRepository orderRepository = new OrderRepository();
     private final RatingService ratingService = new RatingService();
-    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
+    private final repository.RatingRepository ratingRepository = new repository.RatingRepository();
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm, MMM dd");
 
     @FXML
@@ -90,9 +91,12 @@ public class OrdersController {
         historyBtn.getStyleClass().add("btn-sm");
         historyBtn.setOnAction(e -> showHistory(order.getOrderId()));
 
+        boolean canRate = order.getStatus().equalsIgnoreCase("Accepted")
+                && !ratingRepository.hasRated(order.getOrderId());
         Button rateBtn = new Button("Rate Restaurant");
         rateBtn.getStyleClass().addAll("btn-sm", "btn-success");
-        rateBtn.setVisible(order.getStatus().equalsIgnoreCase("Accepted"));
+        rateBtn.setVisible(canRate);
+        rateBtn.setManaged(canRate);
         rateBtn.setOnAction(e -> showRatingDialog(order));
 
         footer.getChildren().addAll(totalLabel, spacer2, historyBtn, rateBtn);
@@ -159,7 +163,8 @@ public class OrdersController {
         result.ifPresent(rating -> {
             if (ratingService.submitRating(rating)) {
                 Alert success = new Alert(Alert.AlertType.INFORMATION, "Thank you for your feedback!");
-                success.show();
+                success.showAndWait();
+                loadOrders();   // hide the Rate button immediately
             } else {
                 Alert error = new Alert(Alert.AlertType.ERROR, "Could not submit rating. Ensure it's within 24 hours of order acceptance.");
                 error.show();

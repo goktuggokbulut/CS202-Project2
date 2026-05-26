@@ -12,6 +12,7 @@
     <HBox alignment="CENTER_LEFT" spacing="15.0">
         <Label text="Incoming Order Requests" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
         <Region HBox.hgrow="ALWAYS" />
+        <ComboBox fx:id="restaurantSelector" prefWidth="220" promptText="Select restaurant" />
         <Button text="Refresh" onAction="#loadPendingOrders" styleClass="flat" />
     </HBox>
 

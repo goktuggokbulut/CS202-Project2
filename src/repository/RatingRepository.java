@@ -27,6 +27,21 @@ public class RatingRepository {
         return null;
     }
 
+    /** Returns true if a rating already exists for the given order. */
+    public boolean hasRated(int orderId) {
+        String sql = "SELECT 1 FROM Rating WHERE order_id = ?";
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, orderId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * Listing 6 Step 2: Insert the rating.
      */

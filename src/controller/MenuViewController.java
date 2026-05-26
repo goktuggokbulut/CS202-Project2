@@ -29,7 +29,7 @@ public class MenuViewController {
     @FXML private Label totalLabel;
 
     private final MenuRepository menuRepository = new MenuRepository();
-    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
 
     @FXML
     public void initialize() {

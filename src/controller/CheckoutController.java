@@ -29,7 +29,7 @@ public class CheckoutController {
 
     private final OrderService orderService = new OrderService();
     private final CouponRepository couponRepository = new CouponRepository();
-    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
 
     private BigDecimal subtotal = BigDecimal.ZERO;
     private BigDecimal discount = BigDecimal.ZERO;

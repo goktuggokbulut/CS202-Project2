@@ -46,6 +46,7 @@ public class MainDashboardController {
             addButton("Profile", "profile");
         } else {
             addButton("Dashboard Overview", "manager_overview");
+            addButton("My Restaurant", "restaurant_settings");
             addButton("Manage Menu", "menu_editor");
             addButton("Order Requests", "order_requests");
             addButton("Monthly Statistics", "statistics");

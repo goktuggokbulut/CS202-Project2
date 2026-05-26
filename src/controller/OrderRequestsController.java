@@ -1,7 +1,9 @@
 package controller;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
@@ -9,7 +11,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import model.Order;
 import model.OrderItem;
+import model.Restaurant;
 import repository.OrderRepository;
+import repository.RestaurantRepository;
 import utils.Session;
 
 import java.text.NumberFormat;
@@ -19,25 +23,38 @@ import java.util.Locale;
 
 public class OrderRequestsController {
 
+    @FXML private ComboBox<Restaurant> restaurantSelector;
     @FXML private VBox ordersContainer;
     @FXML private Label emptyLabel;
 
     private final OrderRepository orderRepository = new OrderRepository();
-    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
+    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("tr", "TR"));
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm, MMM dd");
 
     @FXML
     public void initialize() {
-        loadPendingOrders();
+        String managerUsername = Session.getCurrentUser().getUsername();
+        List<Restaurant> restaurants = restaurantRepository.getRestaurantsByManager(managerUsername);
+
+        restaurantSelector.setItems(FXCollections.observableArrayList(restaurants));
+        restaurantSelector.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldVal, newVal) -> { if (newVal != null) loadPendingOrders(); }
+        );
+
+        if (!restaurants.isEmpty()) {
+            restaurantSelector.getSelectionModel().selectFirst();
+        }
     }
 
     @FXML
     private void loadPendingOrders() {
         ordersContainer.getChildren().clear();
-        
-        // Mocking restaurant ID 1 for now
-        int restaurantId = 1;
-        List<Order> pendingOrders = orderRepository.getOrdersByRestaurantAndStatus(restaurantId, "Preparing");
+        Restaurant selected = restaurantSelector.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        List<Order> pendingOrders = orderRepository.getOrdersByRestaurantAndStatus(
+                selected.getRestaurantId(), "Sent");
 
         if (pendingOrders.isEmpty()) {
             emptyLabel.setVisible(true);
@@ -67,7 +84,7 @@ public class OrderRequestsController {
 
         Label timeLabel = new Label(order.getCreatedAt().format(timeFormatter));
         timeLabel.setStyle("-fx-text-fill: #57606a;");
-        
+
         header.getChildren().addAll(titleInfo, spacer, timeLabel);
 
         VBox itemsBox = new VBox(5);

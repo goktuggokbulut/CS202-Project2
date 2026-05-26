@@ -43,4 +43,7 @@ public class Restaurant {
     public void   setLabel(String v)              { this.label = v; }
     public List<String> getKeywords()             { return keywords; }
     public void   setKeywords(List<String> v)     { this.keywords = v; }
+
+    @Override
+    public String toString() { return name + " (" + city + ")"; }
 }

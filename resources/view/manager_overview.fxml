@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="25.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.ManagerOverviewController">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15.0">
+        <Label text="Dashboard Overview" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <ComboBox fx:id="restaurantSelector" prefWidth="240" promptText="Select restaurant" />
+    </HBox>
+
+    <Separator />
+
+    <!-- Restaurant Info Card -->
+    <VBox spacing="15.0" style="-fx-background-color: white; -fx-border-color: #d0d7de; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20;">
+        <Label text="Restaurant Details" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+        <HBox spacing="30.0">
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                <Label text="Name" style="-fx-font-size: 12px; -fx-text-fill: #57606a; -fx-font-weight: bold;" />
+                <Label fx:id="nameLabel" text="—" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            </VBox>
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                <Label text="Cuisine" style="-fx-font-size: 12px; -fx-text-fill: #57606a; -fx-font-weight: bold;" />
+                <Label fx:id="cuisineLabel" text="—" style="-fx-font-size: 16px;" />
+            </VBox>
+        </HBox>
+
+        <HBox spacing="30.0">
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                <Label text="City" style="-fx-font-size: 12px; -fx-text-fill: #57606a; -fx-font-weight: bold;" />
+                <Label fx:id="cityLabel" text="—" style="-fx-font-size: 16px;" />
+            </VBox>
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                <Label text="Address" style="-fx-font-size: 12px; -fx-text-fill: #57606a; -fx-font-weight: bold;" />
+                <Label fx:id="addressLabel" text="—" style="-fx-font-size: 16px;" />
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- Rating Card -->
+    <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #d0d7de; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20;">
+        <Label text="Customer Rating" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        <Label fx:id="ratingLabel" text="★ —" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+        <Label fx:id="ratingCountLabel" text="" style="-fx-text-fill: #57606a;" />
+        <Label text="Restaurants need at least 10 ratings before an average is displayed."
+               style="-fx-text-fill: #57606a; -fx-font-size: 11px; -fx-wrap-text: true;" />
+    </VBox>
+
+</VBox>

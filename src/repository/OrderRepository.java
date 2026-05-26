@@ -17,9 +17,9 @@ public class OrderRepository {
      */
     public boolean placeOrder(Order order, List<OrderItem> items) {
         String sqlOrder = "INSERT INTO `Order` (customer_id, restaurant_id, coupon_id, status, total_amount, discount_applied) " +
-                          "VALUES (?, ?, ?, 'Preparing', ?, ?)";
+                          "VALUES (?, ?, ?, 'Sent', ?, ?)";
         String sqlItem = "INSERT INTO Order_Item (order_id, item_id, quantity, unit_price) VALUES (?, ?, ?, ?)";
-        String sqlHistory = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Preparing')";
+        String sqlHistory = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Sent')";
 
         try (Connection conn = DatabaseConnectionManager.getConnection()) {
             conn.setAutoCommit(false);
@@ -95,19 +95,25 @@ public class OrderRepository {
      * Listing 5: Restaurant accepts an incoming order.
      */
     public boolean acceptOrder(int orderId) {
-        String sqlUpdate = "UPDATE `Order` SET status = 'Accepted' WHERE order_id = ?";
-        String sqlHistory = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Accepted')";
+        String sqlUpdate  = "UPDATE `Order` SET status = 'Accepted' WHERE order_id = ?";
+        // Log Preparing then Accepted so all three stages appear in Order_Status_History.
+        String sqlPrepare = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Preparing')";
+        String sqlAccept  = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Accepted')";
 
         try (Connection conn = DatabaseConnectionManager.getConnection()) {
             conn.setAutoCommit(false);
-            try (PreparedStatement stmt1 = conn.prepareStatement(sqlUpdate);
-                 PreparedStatement stmt2 = conn.prepareStatement(sqlHistory)) {
-                
-                stmt1.setInt(1, orderId);
-                stmt1.executeUpdate();
+            try (PreparedStatement stmtUpd  = conn.prepareStatement(sqlUpdate);
+                 PreparedStatement stmtPrep = conn.prepareStatement(sqlPrepare);
+                 PreparedStatement stmtAcc  = conn.prepareStatement(sqlAccept)) {
 
-                stmt2.setInt(1, orderId);
-                stmt2.executeUpdate();
+                stmtUpd.setInt(1, orderId);
+                stmtUpd.executeUpdate();
+
+                stmtPrep.setInt(1, orderId);
+                stmtPrep.executeUpdate();
+
+                stmtAcc.setInt(1, orderId);
+                stmtAcc.executeUpdate();
 
                 conn.commit();
                 return true;

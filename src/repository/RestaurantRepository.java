@@ -13,13 +13,23 @@ public class RestaurantRepository {
      * Listing 1: Restaurant search with keyword and city filter.
      */
     public List<Restaurant> searchByCityAndKeyword(String city, String keyword) {
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+
+        // When a keyword is provided, JOIN on Restaurant_Keyword and count matches so
+        // results are ranked: most keyword hits first, then by avg rating.
+        // When no keyword is given, skip the keyword join entirely and rank purely by
+        // avg rating — prevents restaurants with more keywords from unfairly floating up.
         String sql = "SELECT r.restaurant_id, r.name, r.cuisine_type, r.address, r.city, r.manager_id, " +
-                     "COUNT(DISTINCT rk.keyword) AS keyword_matches, " +
+                     (hasKeyword
+                         ? "COUNT(DISTINCT rk.keyword) AS keyword_matches, "
+                         : "0 AS keyword_matches, ") +
                      "CASE WHEN COUNT(rt.rating_id) >= 10 THEN AVG(rt.score) ELSE 0 END AS avg_rating, " +
                      "COUNT(rt.rating_id) AS rating_count, " +
                      "CASE WHEN COUNT(rt.rating_id) < 10 THEN 'New' ELSE NULL END AS label " +
                      "FROM Restaurant r " +
-                     "LEFT JOIN Restaurant_Keyword rk ON rk.restaurant_id = r.restaurant_id AND rk.keyword LIKE ? " +
+                     (hasKeyword
+                         ? "LEFT JOIN Restaurant_Keyword rk ON rk.restaurant_id = r.restaurant_id AND rk.keyword LIKE ? "
+                         : "") +
                      "LEFT JOIN `Order` o ON o.restaurant_id = r.restaurant_id " +
                      "LEFT JOIN Rating rt ON rt.order_id = o.order_id " +
                      "WHERE r.city = ? " +
@@ -29,14 +39,17 @@ public class RestaurantRepository {
         List<Restaurant> results = new ArrayList<>();
         try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, "%" + keyword + "%");
-            stmt.setString(2, city);
-            
+
+            if (hasKeyword) {
+                stmt.setString(1, "%" + keyword + "%");
+                stmt.setString(2, city);
+            } else {
+                stmt.setString(1, city);
+            }
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Restaurant rest = mapResultSetToRestaurant(rs);
-                    // Additional columns from the complex query
                     rest.setAvgRating(rs.getDouble("avg_rating"));
                     rest.setRatingCount(rs.getInt("rating_count"));
                     rest.setLabel(rs.getString("label"));
@@ -58,6 +71,137 @@ public class RestaurantRepository {
         rest.setCity(rs.getString("city"));
         rest.setManagerId(rs.getString("manager_id"));
         return rest;
+    }
+
+    /** Returns all keywords for a restaurant. */
+    public List<String> getKeywords(int restaurantId) {
+        String sql = "SELECT keyword FROM Restaurant_Keyword WHERE restaurant_id = ? ORDER BY keyword";
+        List<String> kws = new ArrayList<>();
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, restaurantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) kws.add(rs.getString("keyword"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return kws;
+    }
+
+    /**
+     * Returns all restaurants managed by the given manager username,
+     * with derived rating fields populated.
+     */
+    public List<Restaurant> getRestaurantsByManager(String managerUsername) {
+        String sql = "SELECT r.restaurant_id, r.name, r.cuisine_type, r.address, r.city, r.manager_id, " +
+                     "CASE WHEN COUNT(rt.rating_id) >= 10 THEN AVG(rt.score) ELSE 0 END AS avg_rating, " +
+                     "COUNT(rt.rating_id) AS rating_count, " +
+                     "CASE WHEN COUNT(rt.rating_id) < 10 THEN 'New' ELSE NULL END AS label " +
+                     "FROM Restaurant r " +
+                     "LEFT JOIN `Order` o ON o.restaurant_id = r.restaurant_id " +
+                     "LEFT JOIN Rating rt ON rt.order_id = o.order_id " +
+                     "WHERE r.manager_id = ? " +
+                     "GROUP BY r.restaurant_id, r.name, r.cuisine_type, r.address, r.city, r.manager_id";
+        List<Restaurant> results = new ArrayList<>();
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, managerUsername);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Restaurant rest = mapResultSetToRestaurant(rs);
+                    rest.setAvgRating(rs.getDouble("avg_rating"));
+                    rest.setRatingCount(rs.getInt("rating_count"));
+                    rest.setLabel(rs.getString("label"));
+                    results.add(rest);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+    /**
+     * Creates a new restaurant (and its keywords) in a single transaction.
+     * Returns the persisted Restaurant with its generated ID, or null on failure.
+     */
+    public Restaurant createRestaurant(Restaurant restaurant) {
+        String sqlRest = "INSERT INTO Restaurant (name, cuisine_type, address, city, manager_id) VALUES (?, ?, ?, ?, ?)";
+        String sqlKw   = "INSERT INTO Restaurant_Keyword (restaurant_id, keyword) VALUES (?, ?)";
+        try (Connection conn = DatabaseConnectionManager.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement stmtRest = conn.prepareStatement(sqlRest, Statement.RETURN_GENERATED_KEYS)) {
+                stmtRest.setString(1, restaurant.getName());
+                stmtRest.setString(2, restaurant.getCuisineType());
+                stmtRest.setString(3, restaurant.getAddress());
+                stmtRest.setString(4, restaurant.getCity());
+                stmtRest.setString(5, restaurant.getManagerId());
+                stmtRest.executeUpdate();
+                try (ResultSet rs = stmtRest.getGeneratedKeys()) {
+                    if (rs.next()) restaurant.setRestaurantId(rs.getInt(1));
+                }
+                if (restaurant.getKeywords() != null && !restaurant.getKeywords().isEmpty()) {
+                    try (PreparedStatement stmtKw = conn.prepareStatement(sqlKw)) {
+                        for (String kw : restaurant.getKeywords()) {
+                            stmtKw.setInt(1, restaurant.getRestaurantId());
+                            stmtKw.setString(2, kw.trim().toLowerCase());
+                            stmtKw.addBatch();
+                        }
+                        stmtKw.executeBatch();
+                    }
+                }
+                conn.commit();
+                return restaurant;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Updates name, cuisine_type, address and city of an existing restaurant.
+     * Keywords are replaced wholesale: old ones are deleted, new ones inserted.
+     */
+    public boolean updateRestaurant(Restaurant restaurant) {
+        String sqlUpdate = "UPDATE Restaurant SET name=?, cuisine_type=?, address=?, city=? WHERE restaurant_id=?";
+        String sqlDelKw  = "DELETE FROM Restaurant_Keyword WHERE restaurant_id=?";
+        String sqlInsKw  = "INSERT INTO Restaurant_Keyword (restaurant_id, keyword) VALUES (?, ?)";
+        try (Connection conn = DatabaseConnectionManager.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement stmtUpd = conn.prepareStatement(sqlUpdate);
+                 PreparedStatement stmtDel = conn.prepareStatement(sqlDelKw);
+                 PreparedStatement stmtIns = conn.prepareStatement(sqlInsKw)) {
+                stmtUpd.setString(1, restaurant.getName());
+                stmtUpd.setString(2, restaurant.getCuisineType());
+                stmtUpd.setString(3, restaurant.getAddress());
+                stmtUpd.setString(4, restaurant.getCity());
+                stmtUpd.setInt(5, restaurant.getRestaurantId());
+                stmtUpd.executeUpdate();
+                stmtDel.setInt(1, restaurant.getRestaurantId());
+                stmtDel.executeUpdate();
+                if (restaurant.getKeywords() != null) {
+                    for (String kw : restaurant.getKeywords()) {
+                        stmtIns.setInt(1, restaurant.getRestaurantId());
+                        stmtIns.setString(2, kw.trim().toLowerCase());
+                        stmtIns.addBatch();
+                    }
+                    stmtIns.executeBatch();
+                }
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**

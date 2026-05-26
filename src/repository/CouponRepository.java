@@ -4,6 +4,8 @@ import model.Coupon;
 import utils.DatabaseConnectionManager;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CouponRepository {
 
@@ -65,5 +67,74 @@ public class CouponRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // ----------------------------------------------------------------
+    // Write / list operations
+    // ----------------------------------------------------------------
+
+    public List<Coupon> getCouponsByRestaurant(int restaurantId) {
+        String sql = "SELECT * FROM Coupon WHERE restaurant_id = ? ORDER BY valid_until DESC";
+        List<Coupon> coupons = new ArrayList<>();
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, restaurantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    coupons.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return coupons;
+    }
+
+    public Coupon createCoupon(Coupon coupon) {
+        String sql = "INSERT INTO Coupon (code, discount_type, discount_value, valid_from, valid_until, is_active, restaurant_id) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, coupon.getCode());
+            stmt.setString(2, coupon.getDiscountType());
+            stmt.setBigDecimal(3, coupon.getDiscountValue());
+            stmt.setDate(4, java.sql.Date.valueOf(coupon.getValidFrom()));
+            stmt.setDate(5, java.sql.Date.valueOf(coupon.getValidUntil()));
+            stmt.setBoolean(6, coupon.isActive());
+            stmt.setInt(7, coupon.getRestaurantId());
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) coupon.setCouponId(rs.getInt(1));
+            }
+            return coupon;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean deactivateCoupon(int couponId) {
+        String sql = "UPDATE Coupon SET is_active = FALSE WHERE coupon_id = ?";
+        try (Connection conn = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, couponId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private Coupon mapRow(ResultSet rs) throws SQLException {
+        Coupon c = new Coupon();
+        c.setCouponId(rs.getInt("coupon_id"));
+        c.setCode(rs.getString("code"));
+        c.setDiscountType(rs.getString("discount_type"));
+        c.setDiscountValue(rs.getBigDecimal("discount_value"));
+        c.setValidFrom(rs.getDate("valid_from").toLocalDate());
+        c.setValidUntil(rs.getDate("valid_until").toLocalDate());
+        c.setActive(rs.getBoolean("is_active"));
+        c.setRestaurantId(rs.getInt("restaurant_id"));
+        return c;
     }
 }
