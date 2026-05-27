@@ -21,14 +21,16 @@ public class OrderRepository {
         String sqlOrder = "INSERT INTO `Order` (customer_id, restaurant_id, coupon_id, status, total_amount, discount_applied) " +
                           "VALUES (?, ?, ?, 'Sent', ?, ?)";
         String sqlItem = "INSERT INTO Order_Item (order_id, item_id, quantity, unit_price) VALUES (?, ?, ?, ?)";
-        String sqlHistory = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Sent')";
+        String sqlPreparing = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Preparing')";
+        String sqlHistory   = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Sent')";
 
         try (Connection conn = DatabaseConnectionManager.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement stmtOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement stmtItem = conn.prepareStatement(sqlItem);
+                 PreparedStatement stmtPreparing = conn.prepareStatement(sqlPreparing);
                  PreparedStatement stmtHistory = conn.prepareStatement(sqlHistory)) {
-                
+
                 // 1. Insert Order
                 stmtOrder.setString(1, order.getCustomerId());
                 stmtOrder.setInt(2, order.getRestaurantId());
@@ -53,7 +55,10 @@ public class OrderRepository {
                 }
                 stmtItem.executeBatch();
 
-                // 3. Log initial status
+                // 3. Log Preparing stage, then Sent (tracks full order lifecycle)
+                stmtPreparing.setInt(1, orderId);
+                stmtPreparing.executeUpdate();
+
                 stmtHistory.setInt(1, orderId);
                 stmtHistory.executeUpdate();
 
@@ -97,22 +102,16 @@ public class OrderRepository {
      * Listing 5: Restaurant accepts an incoming order.
      */
     public boolean acceptOrder(int orderId) {
-        String sqlUpdate  = "UPDATE `Order` SET status = 'Accepted' WHERE order_id = ?";
-        // Log Preparing then Accepted so all three stages appear in Order_Status_History.
-        String sqlPrepare = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Preparing')";
-        String sqlAccept  = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Accepted')";
+        String sqlUpdate = "UPDATE `Order` SET status = 'Accepted' WHERE order_id = ?";
+        String sqlAccept = "INSERT INTO Order_Status_History (order_id, status) VALUES (?, 'Accepted')";
 
         try (Connection conn = DatabaseConnectionManager.getConnection()) {
             conn.setAutoCommit(false);
-            try (PreparedStatement stmtUpd  = conn.prepareStatement(sqlUpdate);
-                 PreparedStatement stmtPrep = conn.prepareStatement(sqlPrepare);
-                 PreparedStatement stmtAcc  = conn.prepareStatement(sqlAccept)) {
+            try (PreparedStatement stmtUpd = conn.prepareStatement(sqlUpdate);
+                 PreparedStatement stmtAcc = conn.prepareStatement(sqlAccept)) {
 
                 stmtUpd.setInt(1, orderId);
                 stmtUpd.executeUpdate();
-
-                stmtPrep.setInt(1, orderId);
-                stmtPrep.executeUpdate();
 
                 stmtAcc.setInt(1, orderId);
                 stmtAcc.executeUpdate();

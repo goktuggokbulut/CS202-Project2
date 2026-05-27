@@ -5,6 +5,9 @@
 -- Spring 2026
 -- ============================================================
 
+CREATE DATABASE IF NOT EXISTS food_order_db;
+USE food_order_db;
+
 -- ============================================================
 -- DROP tables in reverse dependency order
 -- (safe to re-run)

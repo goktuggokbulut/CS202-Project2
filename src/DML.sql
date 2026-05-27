@@ -4,6 +4,8 @@
 -- Group 5: Goktug Gokbulut & Alperen Cimen
 -- Spring 2026
 -- ============================================================
+
+USE food_order_db;
 -- Minimum requirements covered:
 --   ✓  3 Restaurant Managers
 --   ✓  5 Customers
@@ -171,6 +173,8 @@ INSERT INTO Coupon (coupon_id, code, discount_type, discount_value,
 
 -- ============================================================
 -- 11. ORDER  (10 orders, all Accepted so ratings can be left)
+--     Dates set to May 2026 so they fall within the 1-month
+--     statistics window (queries use DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH)).
 --
 --  Discount calculations:
 --    Order 2 : 180.00 × 15%  = 27.00  → total 153.00
@@ -181,16 +185,16 @@ INSERT INTO Coupon (coupon_id, code, discount_type, discount_value,
 -- ============================================================
 INSERT INTO `Order` (order_id, customer_id, restaurant_id, coupon_id,
                      status, created_at, total_amount, discount_applied) VALUES
-(1,  'alice_cust', 1, NULL, 'Accepted', '2026-04-15 12:00:00', 210.00,   0.00),
-(2,  'alice_cust', 2,    2, 'Accepted', '2026-04-15 13:00:00', 153.00,  27.00),
-(3,  'bob_cust',   3,    3, 'Accepted', '2026-04-16 11:00:00', 200.00,  20.00),
-(4,  'bob_cust',   4, NULL, 'Accepted', '2026-04-16 18:00:00', 165.00,   0.00),
-(5,  'ceren_cust', 1,    1, 'Accepted', '2026-04-17 12:30:00', 270.00,  30.00),
-(6,  'ceren_cust', 2, NULL, 'Accepted', '2026-04-17 19:00:00', 245.00,   0.00),
-(7,  'dave_cust',  3, NULL, 'Accepted', '2026-04-18 13:00:00', 410.00,   0.00),
-(8,  'dave_cust',  4,    4, 'Accepted', '2026-04-18 19:30:00', 175.00,   5.00),
-(9,  'elif_cust',  5, NULL, 'Accepted', '2026-04-19 12:00:00', 225.00,   0.00),
-(10, 'elif_cust',  5,    5, 'Accepted', '2026-04-20 12:00:00', 283.50,  31.50);
+(1,  'alice_cust', 1, NULL, 'Accepted', '2026-05-01 12:00:00', 210.00,   0.00),
+(2,  'alice_cust', 2,    2, 'Accepted', '2026-05-01 13:00:00', 153.00,  27.00),
+(3,  'bob_cust',   3,    3, 'Accepted', '2026-05-02 11:00:00', 200.00,  20.00),
+(4,  'bob_cust',   4, NULL, 'Accepted', '2026-05-02 18:00:00', 165.00,   0.00),
+(5,  'ceren_cust', 1,    1, 'Accepted', '2026-05-03 12:30:00', 270.00,  30.00),
+(6,  'ceren_cust', 2, NULL, 'Accepted', '2026-05-03 19:00:00', 245.00,   0.00),
+(7,  'dave_cust',  3, NULL, 'Accepted', '2026-05-04 13:00:00', 410.00,   0.00),
+(8,  'dave_cust',  4,    4, 'Accepted', '2026-05-04 19:30:00', 175.00,   5.00),
+(9,  'elif_cust',  5, NULL, 'Accepted', '2026-05-05 12:00:00', 225.00,   0.00),
+(10, 'elif_cust',  5,    5, 'Accepted', '2026-05-06 12:00:00', 283.50,  31.50);
 
 
 -- ============================================================
@@ -238,45 +242,45 @@ INSERT INTO Order_Item (order_id, item_id, quantity, unit_price) VALUES
 -- ============================================================
 INSERT INTO Order_Status_History (order_id, status, time_stamp) VALUES
 -- Order 1
-(1,  'Preparing', '2026-04-15 12:00:00'),
-(1,  'Sent',      '2026-04-15 12:15:00'),
-(1,  'Accepted',  '2026-04-15 12:45:00'),
+(1,  'Preparing', '2026-05-01 12:00:00'),
+(1,  'Sent',      '2026-05-01 12:15:00'),
+(1,  'Accepted',  '2026-05-01 12:45:00'),
 -- Order 2
-(2,  'Preparing', '2026-04-15 13:00:00'),
-(2,  'Sent',      '2026-04-15 13:20:00'),
-(2,  'Accepted',  '2026-04-15 14:00:00'),
+(2,  'Preparing', '2026-05-01 13:00:00'),
+(2,  'Sent',      '2026-05-01 13:20:00'),
+(2,  'Accepted',  '2026-05-01 14:00:00'),
 -- Order 3
-(3,  'Preparing', '2026-04-16 11:00:00'),
-(3,  'Sent',      '2026-04-16 11:20:00'),
-(3,  'Accepted',  '2026-04-16 12:00:00'),
+(3,  'Preparing', '2026-05-02 11:00:00'),
+(3,  'Sent',      '2026-05-02 11:20:00'),
+(3,  'Accepted',  '2026-05-02 12:00:00'),
 -- Order 4
-(4,  'Preparing', '2026-04-16 18:00:00'),
-(4,  'Sent',      '2026-04-16 18:15:00'),
-(4,  'Accepted',  '2026-04-16 18:50:00'),
+(4,  'Preparing', '2026-05-02 18:00:00'),
+(4,  'Sent',      '2026-05-02 18:15:00'),
+(4,  'Accepted',  '2026-05-02 18:50:00'),
 -- Order 5
-(5,  'Preparing', '2026-04-17 12:30:00'),
-(5,  'Sent',      '2026-04-17 12:50:00'),
-(5,  'Accepted',  '2026-04-17 13:20:00'),
+(5,  'Preparing', '2026-05-03 12:30:00'),
+(5,  'Sent',      '2026-05-03 12:50:00'),
+(5,  'Accepted',  '2026-05-03 13:20:00'),
 -- Order 6
-(6,  'Preparing', '2026-04-17 19:00:00'),
-(6,  'Sent',      '2026-04-17 19:15:00'),
-(6,  'Accepted',  '2026-04-17 19:45:00'),
+(6,  'Preparing', '2026-05-03 19:00:00'),
+(6,  'Sent',      '2026-05-03 19:15:00'),
+(6,  'Accepted',  '2026-05-03 19:45:00'),
 -- Order 7
-(7,  'Preparing', '2026-04-18 13:00:00'),
-(7,  'Sent',      '2026-04-18 13:20:00'),
-(7,  'Accepted',  '2026-04-18 14:00:00'),
+(7,  'Preparing', '2026-05-04 13:00:00'),
+(7,  'Sent',      '2026-05-04 13:20:00'),
+(7,  'Accepted',  '2026-05-04 14:00:00'),
 -- Order 8
-(8,  'Preparing', '2026-04-18 19:30:00'),
-(8,  'Sent',      '2026-04-18 19:45:00'),
-(8,  'Accepted',  '2026-04-18 20:15:00'),
+(8,  'Preparing', '2026-05-04 19:30:00'),
+(8,  'Sent',      '2026-05-04 19:45:00'),
+(8,  'Accepted',  '2026-05-04 20:15:00'),
 -- Order 9
-(9,  'Preparing', '2026-04-19 12:00:00'),
-(9,  'Sent',      '2026-04-19 12:30:00'),
-(9,  'Accepted',  '2026-04-19 13:00:00'),
+(9,  'Preparing', '2026-05-05 12:00:00'),
+(9,  'Sent',      '2026-05-05 12:30:00'),
+(9,  'Accepted',  '2026-05-05 13:00:00'),
 -- Order 10
-(10, 'Preparing', '2026-04-20 12:00:00'),
-(10, 'Sent',      '2026-04-20 12:20:00'),
-(10, 'Accepted',  '2026-04-20 13:00:00');
+(10, 'Preparing', '2026-05-06 12:00:00'),
+(10, 'Sent',      '2026-05-06 12:20:00'),
+(10, 'Accepted',  '2026-05-06 13:00:00');
 
 
 -- ============================================================
@@ -296,16 +300,16 @@ INSERT INTO Order_Status_History (order_id, status, time_stamp) VALUES
 --     this correctly demonstrates the threshold rule.
 -- ============================================================
 INSERT INTO Rating (rating_id, score, comment, created_at, customer_id, order_id) VALUES
-(1,  5, 'Excellent meze and perfectly cooked kebap!',       '2026-04-15 14:30:00', 'alice_cust', 1),
-(2,  4, 'Great pasta, very generous portions.',              '2026-04-15 15:00:00', 'alice_cust', 2),
-(3,  5, 'Best California Roll I have had in Istanbul.',      '2026-04-16 13:00:00', 'bob_cust',   3),
-(4,  4, 'Tasty burgers, fries were crispy.',                 '2026-04-16 20:00:00', 'bob_cust',   4),
-(5,  5, 'Lamb ribs were fall-off-the-bone perfect!',         '2026-04-17 14:30:00', 'ceren_cust', 5),
-(6,  3, 'Pasta was good but took longer than expected.',     '2026-04-17 21:00:00', 'ceren_cust', 6),
-(7,  5, 'Dragon roll was outstanding, very fresh fish.',     '2026-04-18 15:30:00', 'dave_cust',  7),
-(8,  4, 'Solid BBQ burgers, sauce was delicious.',           '2026-04-18 21:30:00', 'dave_cust',  8),
-(9,  5, 'Best Iskender in Ankara, exactly like home!',       '2026-04-19 14:00:00', 'elif_cust',  9),
-(10, 4, 'Kofte was juicy and the bulgur pilaf was perfect.', '2026-04-20 14:00:00', 'elif_cust',  10);
+(1,  5, 'Excellent meze and perfectly cooked kebap!',       '2026-05-01 14:30:00', 'alice_cust', 1),
+(2,  4, 'Great pasta, very generous portions.',              '2026-05-01 15:00:00', 'alice_cust', 2),
+(3,  5, 'Best California Roll I have had in Istanbul.',      '2026-05-02 13:00:00', 'bob_cust',   3),
+(4,  4, 'Tasty burgers, fries were crispy.',                 '2026-05-02 20:00:00', 'bob_cust',   4),
+(5,  5, 'Lamb ribs were fall-off-the-bone perfect!',         '2026-05-03 14:30:00', 'ceren_cust', 5),
+(6,  3, 'Pasta was good but took longer than expected.',     '2026-05-03 21:00:00', 'ceren_cust', 6),
+(7,  5, 'Dragon roll was outstanding, very fresh fish.',     '2026-05-04 15:30:00', 'dave_cust',  7),
+(8,  4, 'Solid BBQ burgers, sauce was delicious.',           '2026-05-04 21:30:00', 'dave_cust',  8),
+(9,  5, 'Best Iskender in Ankara, exactly like home!',       '2026-05-05 14:00:00', 'elif_cust',  9),
+(10, 4, 'Kofte was juicy and the bulgur pilaf was perfect.', '2026-05-06 14:00:00', 'elif_cust',  10);
 
 -- ============================================================
 -- END OF DML.sql

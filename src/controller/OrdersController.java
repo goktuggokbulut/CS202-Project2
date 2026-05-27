@@ -17,6 +17,8 @@ import service.RatingService;
 import utils.Session;
 
 import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -97,8 +99,12 @@ public class OrdersController {
         historyBtn.getStyleClass().add("btn-sm");
         historyBtn.setOnAction(e -> showHistory(order.getOrderId()));
 
+        LocalDateTime acceptanceTime = ratingRepository.getAcceptanceTime(order.getOrderId());
+        boolean withinWindow = acceptanceTime != null
+                && Duration.between(acceptanceTime, LocalDateTime.now()).toHours() <= 24;
         boolean canRate = order.getStatus().equalsIgnoreCase("Accepted")
-                && !ratingRepository.hasRated(order.getOrderId());
+                && !ratingRepository.hasRated(order.getOrderId())
+                && withinWindow;
         Button rateBtn = new Button("Rate Restaurant");
         rateBtn.getStyleClass().addAll("btn-sm", "btn-success");
         rateBtn.setVisible(canRate);
