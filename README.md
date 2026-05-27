@@ -15,24 +15,18 @@
 
 ## 1. Database Setup
 
-### 1a. Create the database
-Open MySQL Workbench (or any MySQL client) and run:
-```sql
-CREATE DATABASE food_order_db;
-USE food_order_db;
-```
-
-### 1b. Run the DDL script
-Execute `src/DDL.sql` to create all tables, indexes, and triggers:
+### 1a. Run the DDL script
+`DDL.sql` creates the database automatically. Execute it from the project root:
 ```bash
-mysql -u root -p food_order_db < src/DDL.sql
+mysql -u root -p < src/DDL.sql
 ```
+Or open `src/DDL.sql` in MySQL Workbench and run it. This creates the `food_order_db` database, all tables, indexes, and triggers.
 
-### 1c. Populate sample data
-Execute `src/DML.sql` to insert the minimum required sample data:
+### 1b. Populate sample data
 ```bash
-mysql -u root -p food_order_db < src/DML.sql
+mysql -u root -p < src/DML.sql
 ```
+Or open `src/DML.sql` in MySQL Workbench and run it.
 
 ---
 
